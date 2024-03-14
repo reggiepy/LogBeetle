@@ -12,7 +12,8 @@ import (
 // @Accept x-www-form-urlencoded
 // @Produce json
 //
-//	@Param			message	formData		string		true	"message"
+//	@Param			message			formData		string		true	"message"
+//	@Param			project_name	formData		string		true	"project_name"
 //
 // @Success      200  {object}   model.JSONResult
 // @router      /send-message   [post]
@@ -25,8 +26,16 @@ func SendMessageHandler(c *gin.Context) {
 		})
 		return
 	}
+	// 从请求体中获取消息内容
+	project_name := c.DefaultPostForm("project_name", "test")
+	if project_name == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "project_name cannot be empty",
+		})
+		return
+	}
 	// 向 NSQ 发送消息
-	err := nsqworker.Producer.Publish("test", []byte(message))
+	err := nsqworker.Producer.Publish(project_name, []byte(message))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to send message to NSQ",

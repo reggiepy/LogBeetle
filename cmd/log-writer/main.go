@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/reggiepy/LogBeetle/consumer"
 	"github.com/reggiepy/LogBeetle/nsqworker"
 	"github.com/reggiepy/LogBeetle/web"
 	"os"
@@ -103,24 +104,24 @@ func main() {
 			wg:   &wg,
 			Name: "nsqProducer",
 			Stop: func() {
-				nsqworker.StopConsumers()
 				nsqworker.StopProducer()
+				consumer.StopConsumers()
 			},
 			Run: func() {
 				nsqworker.InitProducer(nsqworker.ProducerConfig{
 					Address:    address,
 					AuthSecret: authSecret,
 				})
-				nsqworker.AddConsumer(nsqworker.NewConsumer(nsqworker.ConsumerConfig{
-					Address:    address,
-					AuthSecret: authSecret,
-					Topic:      "test",
-					Channel:    "test_channel",
-					Handler: &nsqworker.MessageHandler{Handler: func(message []byte) error {
-						fmt.Println(string(message))
-						return nil
-					}},
-				}))
+				consumer.AddConsumer(
+					consumer.NewLogConsumer(
+						"chemical_chaos",
+						nsqworker.ConsumerConfig{
+							Address:    address,
+							AuthSecret: authSecret,
+							Topic:      "test",
+							Channel:    "test_channel",
+						}, "chemical_chaos.log"),
+				)
 			},
 		},
 	}
