@@ -1,31 +1,10 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/nsqio/go-nsq"
-	"log"
+	"github.com/reggiepy/LogBeetle/nsqworker"
 	"net/http"
 )
-
-var producer *nsq.Producer
-
-func init() {
-	initNSQProducer()
-}
-
-func initNSQProducer() {
-	config := nsq.NewConfig()
-	var err error
-	err = config.Set("auth_secret", "%n&yFA2JD85z^g")
-	if err != nil {
-		fmt.Printf("Failed to set auth_secret %v", err)
-	}
-	producer, err = nsq.NewProducer("192.168.1.110:4150", config)
-	if err != nil {
-		log.Fatalf("Failed to create NSQ producer: %v", err)
-	}
-}
 
 // @Summary 发送消息
 // @Description 发送消息到nsq
@@ -47,7 +26,7 @@ func SendMessageHandler(c *gin.Context) {
 		return
 	}
 	// 向 NSQ 发送消息
-	err := producer.Publish("test", []byte(message))
+	err := nsqworker.Producer.Publish("test", []byte(message))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to send message to NSQ",
