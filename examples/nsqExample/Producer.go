@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"github.com/nsqio/go-nsq"
+	"log"
 )
-
 
 func main() {
 	// Instantiate a producer.
