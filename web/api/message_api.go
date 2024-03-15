@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/reggiepy/LogBeetle/nsqworker"
+	"github.com/reggiepy/LogBeetle/pkg/nsqworker"
 	"net/http"
 	"time"
 )
@@ -18,7 +18,7 @@ import (
 //	@Param			project_name	formData		string		true	"project_name"
 //
 // @Success      200  {object}   model.JSONResult
-// @router      /send-message   [post]
+// @router      /log-beetle/v1/send-message   [post]
 func SendMessageHandler(c *gin.Context) {
 	// 从请求体中获取消息内容
 	message := c.DefaultPostForm("message", "")

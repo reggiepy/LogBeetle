@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/reggiepy/LogBeetle/consumer"
-	"github.com/reggiepy/LogBeetle/nsqworker"
+	"github.com/reggiepy/LogBeetle/pkg/consumer"
+	"github.com/reggiepy/LogBeetle/pkg/nsqworker"
+	"github.com/reggiepy/LogBeetle/pkg/worker"
 	"github.com/reggiepy/LogBeetle/web"
-	"github.com/reggiepy/LogBeetle/worker"
 	"os"
 	"os/signal"
 	"sync"
@@ -72,13 +72,13 @@ func main() {
 				})
 				consumer.AddConsumer(
 					consumer.NewLogConsumer(
-						"chemical_chaos",
+						"test",
 						nsqworker.ConsumerConfig{
 							Address:    address,
 							AuthSecret: authSecret,
 							Topic:      "test",
 							Channel:    "test_channel",
-						}, "chemical_chaos.log"),
+						}, "test.log"),
 				)
 				consumer.AddConsumer(
 					consumer.NewLogConsumer(

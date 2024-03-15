@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/natefinch/lumberjack"
 	"github.com/nsqio/go-nsq"
-	"github.com/reggiepy/LogBeetle/nsqworker"
+	"github.com/reggiepy/LogBeetle/pkg/nsqworker"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

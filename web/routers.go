@@ -31,11 +31,11 @@ func SetupRouter() *gin.Engine {
 	router.Use(middleware.Cors())
 
 	// 定义路由和处理程序
-	router.GET("/", api.HomeHandler)
-	router.GET("/ping", api.PingHandler)
-	router.GET("/about", api.AboutHandler)
-	router.POST("/send-message", api.SendMessageHandler)
+	router.GET("/log-beetle/v1/", api.HomeHandler)
+	router.GET("/log-beetle/v1/ping", api.PingHandler)
+	router.GET("/log-beetle/v1/about", api.AboutHandler)
+	router.POST("/log-beetle/v1/send-message", api.SendMessageHandler)
 	// use ginSwagger middleware to serve the API docs
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/log-beetle/v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return router
 }
