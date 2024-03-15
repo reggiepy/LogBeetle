@@ -11,6 +11,7 @@ var (
 )
 
 func init() {
+	cobra.OnInitialize(initConfig)
 	rootCmd.Flags().StringVarP(&configFile, "config", "c", "./log-beetle.yaml", "config file")
 }
 

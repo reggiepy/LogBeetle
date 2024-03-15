@@ -19,23 +19,24 @@ func SetupRouter() *gin.Engine {
 	docs.SwaggerInfo.Host = "127.0.0.1:1233"
 	docs.SwaggerInfo.BasePath = "/"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
-
 	// 创建路由引擎
-	router := gin.Default()
+	//r := gin.Default()
+	r := gin.New()
+	r.Use(middleware.GinLogger(), middleware.GinRecovery(true))
 	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
 		log.Printf("endpoint %v %v %v %v\n", httpMethod, absolutePath, handlerName, nuHandlers)
 	}
 	// 注册全局中间件
-	router.Use(middleware.ErrorHandler())
-	router.Use(middleware.DddRequestID())
-	router.Use(middleware.Cors())
+	r.Use(middleware.ErrorHandler())
+	r.Use(middleware.DddRequestID())
+	r.Use(middleware.Cors())
 
 	// 定义路由和处理程序
-	router.GET("/log-beetle/v1/", api.HomeHandler)
-	router.GET("/log-beetle/v1/ping", api.PingHandler)
-	router.GET("/log-beetle/v1/about", api.AboutHandler)
-	router.POST("/log-beetle/v1/send-message", api.SendMessageHandler)
+	r.GET("/log-beetle/v1/", api.HomeHandler)
+	r.GET("/log-beetle/v1/ping", api.PingHandler)
+	r.GET("/log-beetle/v1/about", api.AboutHandler)
+	r.POST("/log-beetle/v1/send-message", api.SendMessageHandler)
 	// use ginSwagger middleware to serve the API docs
-	router.GET("/log-beetle/v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	return router
+	r.GET("/log-beetle/v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	return r
 }

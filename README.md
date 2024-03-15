@@ -25,4 +25,9 @@ go run cmd/log-writer/main.go
 swag init -g cmd/log-writer/main.go
 ```
 
+build cli
+```bash
+go run build github.com/reggiepy/LogBeetle/cmd/cli
+```
+
 ## Architecture

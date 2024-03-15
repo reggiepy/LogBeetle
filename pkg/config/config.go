@@ -1,26 +1,36 @@
 package config
 
 import (
-	"github.com/rs/zerolog/log"
+	"fmt"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
+	"os"
 )
 
 var Instance *Config
 
 type Config struct {
-	Env        string `yaml:"Env"`        // 环境：prod、dev
-	BaseUrl    string `yaml:"BaseUrl"`    // base url
-	Port       string `yaml:"Port"`       // 端口
-	LogFile    string `yaml:"LogFile"`    // 日志文件
+	Env     string `yaml:"Env"`     // 环境：prod、dev
+	BaseUrl string `yaml:"BaseUrl"` // base url
+	Port    string `yaml:"Port"`    // 端口
+	LogPath string `yaml:"LogPath"` // 日志文件名
+
+	LogConfig struct {
+		LogFile    string `yaml:"LogFile"`    // 日志文件名
+		MaxSize    int    `yaml:"MaxSize"`    // 日志文件大小限制，单位为 MB
+		MaxBackups int    `yaml:"MaxBackups"` // 最大保留的旧日志文件数量
+		MaxAge     int    `yaml:"MaxAge"`     // 旧日志文件保留天数
+		Compress   bool   `yaml:"Compress"`   // 是否压缩旧日志文件
+		LogLevel   string `yaml:"LogLevel"`   // 日志等级
+		LogFormat  string `yaml:"LogFormat"`  // 日志等级
+	} `yaml:"LogConfig"`
 }
 
 func Init(filename string) *Config {
 	Instance = &Config{}
-	if yamlFile, err := ioutil.ReadFile(filename); err != nil {
-		log.Error().Msg(err)
+	if yamlFile, err := os.ReadFile(filename); err != nil {
+		fmt.Println(err)
 	} else if err = yaml.Unmarshal(yamlFile, Instance); err != nil {
-		log.Error().Msg(err)
+		fmt.Println(err)
 	}
 	return Instance
 }

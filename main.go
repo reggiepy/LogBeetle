@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
+	"github.com/reggiepy/LogBeetle/middleware"
+	"github.com/reggiepy/LogBeetle/pkg/config"
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
 	"github.com/reggiepy/LogBeetle/pkg/nsqworker"
 	"github.com/reggiepy/LogBeetle/pkg/worker"
@@ -12,6 +15,21 @@ import (
 	"sync"
 	"syscall"
 )
+
+var configFile = flag.String("config", "./log-beetle.yaml", "配置文件路径")
+
+func init() {
+	flag.Parse()
+
+	// 初始化配置
+	conf := config.Init(*configFile)
+
+	err := middleware.InitLogger(conf)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(conf)
+}
 
 // @title           Swagger Example API
 // @version         1.0
