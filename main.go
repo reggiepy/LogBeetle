@@ -6,55 +6,12 @@ import (
 	"github.com/reggiepy/LogBeetle/consumer"
 	"github.com/reggiepy/LogBeetle/nsqworker"
 	"github.com/reggiepy/LogBeetle/web"
+	"github.com/reggiepy/LogBeetle/worker"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 )
-
-type Worker struct {
-	Name string `json:"name"`
-	Stop func()
-	Run  func()
-	ctx  context.Context
-	wg   *sync.WaitGroup
-}
-
-func NewWorker() *Worker {
-	return &Worker{}
-}
-
-func (w *Worker) SetName(name string) {
-	w.Name = name
-}
-
-func (w *Worker) SetRun(run func()) {
-	w.Run = run
-}
-
-func (w *Worker) SetStop(stop func()) {
-	w.Stop = stop
-}
-
-func (w *Worker) Start() {
-	go func() {
-		defer w.wg.Done()
-		for {
-			select {
-			case <-w.ctx.Done():
-				fmt.Printf("【%s】Worker stopped\n", w.Name)
-				w.Stop()
-				return
-			default:
-				// Do some work here
-			}
-		}
-	}()
-	go func() {
-		fmt.Printf("【%s】Working Start...\n", w.Name)
-		w.Run()
-	}()
-}
 
 // @title           Swagger Example API
 // @version         1.0
@@ -79,35 +36,36 @@ func main() {
 	defer cancel()
 	// 使用 WaitGroup 等待所有 Goroutine 结束
 	var wg sync.WaitGroup
+	router := web.SetupRouter()
+
 	authSecret := "%n&yFA2JD85z^g"
 	address := "192.168.1.110:4150"
-	workers := []*Worker{
-		&Worker{
-			ctx:  ctx,
-			wg:   &wg,
-			Name: "webserver",
-			Stop: func() {
+	workers := []*worker.Worker{
+		worker.NewWorker(
+			worker.WithName("webserver"),
+			worker.WithCtx(ctx),
+			worker.WithWg(&wg),
+			worker.WithStop(func() {
 
-			},
-			Run: func() {
+			}),
+			worker.WithStart(func() {
 				go func() {
-					router := web.SetupRouter()
 					err := router.Run(":1233")
 					if err != nil {
 						fmt.Printf("Error: %v\n", err)
 					}
 				}()
-			},
-		},
-		&Worker{
-			ctx:  ctx,
-			wg:   &wg,
-			Name: "nsqProducer",
-			Stop: func() {
+			}),
+		),
+		worker.NewWorker(
+			worker.WithName("nsqProducer"),
+			worker.WithCtx(ctx),
+			worker.WithWg(&wg),
+			worker.WithStop(func() {
 				nsqworker.StopProducer()
 				consumer.StopConsumers()
-			},
-			Run: func() {
+			}),
+			worker.WithStart(func() {
 				nsqworker.InitProducer(nsqworker.ProducerConfig{
 					Address:    address,
 					AuthSecret: authSecret,
@@ -122,12 +80,22 @@ func main() {
 							Channel:    "test_channel",
 						}, "chemical_chaos.log"),
 				)
-			},
-		},
+				consumer.AddConsumer(
+					consumer.NewLogConsumer(
+						"chemical_db",
+						nsqworker.ConsumerConfig{
+							Address:    address,
+							AuthSecret: authSecret,
+							Topic:      "chemical-db",
+							Channel:    "test_channel",
+						}, "chemical_db.log"),
+				)
+			}),
+		),
 	}
-	for _, worker := range workers {
+	for _, w := range workers {
 		wg.Add(1)
-		worker.Start()
+		w.Run()
 	}
 	// 捕获信号，以优雅地退出程序
 	sigCh := make(chan os.Signal, 1)

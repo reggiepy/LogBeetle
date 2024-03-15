@@ -5,43 +5,55 @@ import (
 	"github.com/natefinch/lumberjack"
 	"github.com/nsqio/go-nsq"
 	"github.com/reggiepy/LogBeetle/nsqworker"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-	"io"
-	"time"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type LogConsumer struct {
 	Name      string
 	NsqConfig nsqworker.ConsumerConfig
 	LogFile   *lumberjack.Logger
-	Writer    io.Writer
-	Logger    zerolog.Logger
-	Consumer  *nsq.Consumer
+	//Logger    zerolog.Logger
+	Logger2  *zap.Logger
+	Consumer *nsq.Consumer
 }
 
 func NewLogConsumer(name string, nsqConfig nsqworker.ConsumerConfig, fileName string) *LogConsumer {
 	// 创建 lumberjack.Logger 实例用于日志切割
 	logFile := &lumberjack.Logger{
 		Filename:   fileName, // 日志文件名
-		MaxSize:    10,       // 日志文件大小限制，单位为 MB
+		MaxSize:    1,        // 日志文件大小限制，单位为 MB
 		MaxBackups: 5,        // 最大保留的旧日志文件数量
 		MaxAge:     30,       // 旧日志文件保留天数
-		Compress:   true,     // 是否压缩旧日志文件
+		Compress:   false,    // 是否压缩旧日志文件
 	}
-	// 创建 ConsoleWriter 以确保在 Windows 平台下的正确编码
-	writer := zerolog.ConsoleWriter{
-		Out:        logFile,
-		TimeFormat: time.RFC3339,
-		NoColor:    true,
-	}
-	logger := log.Output(writer)
+	//// 创建 ConsoleWriter 以确保在 Windows 平台下的正确编码
+	//writer := zerolog.ConsoleWriter{
+	//	Out:        logFile,
+	//	TimeFormat: time.RFC3339,
+	//	NoColor:    true,
+	//}
+	//logger := log.Output(writer)
+
+	//修改时间编码器，在日志文件中使用大写字母记录日志级别
+	encoderConfig := zap.NewProductionEncoderConfig()
+	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+	// 创建Zap核心
+	core := zapcore.NewCore(
+		zapcore.NewJSONEncoder(encoderConfig),
+		zapcore.AddSync(logFile),
+		zapcore.InfoLevel,
+	)
+
+	// 创建Logger
+	logger2 := zap.New(core)
 
 	c := &LogConsumer{
 		Name:    name,
 		LogFile: logFile,
-		Writer:  &writer,
-		Logger:  logger,
+		//Logger:  logger,
+		Logger2: logger2,
 	}
 	nsqConfig.Handler = &nsqworker.MessageHandler{
 		Handler: c.Handler,
@@ -52,13 +64,21 @@ func NewLogConsumer(name string, nsqConfig nsqworker.ConsumerConfig, fileName st
 }
 
 func (c *LogConsumer) Handler(message []byte) error {
-	c.Logger.Info().Msg(string(message))
+	c.Logger2.Info(string(message))
 	return nil
 }
 func (c *LogConsumer) Close() {
+	var err error
 	if c.LogFile != nil {
 		fmt.Printf("关闭 【%s】 Consumer LogFile\n", c.Name)
-		_ = c.LogFile.Close()
+		err = c.Logger2.Sync()
+		if err != nil {
+			fmt.Printf("Sync Logger2 失败: %v", err)
+		}
+		err = c.LogFile.Close()
+		if err != nil {
+			fmt.Printf("关闭日志文件失败: %v", err)
+		}
 	}
 	if c.Consumer != nil {
 		fmt.Printf("关闭 【%s】 Consumer Consumer\n", c.Name)

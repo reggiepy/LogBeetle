@@ -1,9 +1,11 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/reggiepy/LogBeetle/nsqworker"
 	"net/http"
+	"time"
 )
 
 // @Summary 发送消息
@@ -34,6 +36,7 @@ func SendMessageHandler(c *gin.Context) {
 		})
 		return
 	}
+	start := time.Now()
 	// 向 NSQ 发送消息
 	err := nsqworker.Producer.Publish(project_name, []byte(message))
 	if err != nil {
@@ -42,6 +45,9 @@ func SendMessageHandler(c *gin.Context) {
 		})
 		return
 	}
+	end := time.Now()
+	elapsed := end.Sub(start)
+	fmt.Printf("函数运行时间：%s\n", elapsed)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Message sent to NSQ successfully",
