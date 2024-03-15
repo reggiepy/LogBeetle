@@ -23,6 +23,10 @@ type Config struct {
 		LogLevel   string `yaml:"LogLevel"`   // 日志等级
 		LogFormat  string `yaml:"LogFormat"`  // 日志等级
 	} `yaml:"LogConfig"`
+
+	ConsumerConfig struct {
+		LogPath string `yaml:"LogPath"` //日志输出路径
+	} `yaml:"ConsumerConfig"`
 }
 
 func Init(filename string) *Config {

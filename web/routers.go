@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/reggiepy/LogBeetle/docs"
 	"github.com/reggiepy/LogBeetle/middleware"
+	"github.com/reggiepy/LogBeetle/pkg/logger"
 	"github.com/reggiepy/LogBeetle/web/api"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -22,7 +23,7 @@ func SetupRouter() *gin.Engine {
 	// 创建路由引擎
 	//r := gin.Default()
 	r := gin.New()
-	r.Use(middleware.GinLogger(), middleware.GinRecovery(true))
+	r.Use(middleware.GinLogger(logger.Logger), middleware.GinRecovery(logger.Logger, true))
 	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
 		log.Printf("endpoint %v %v %v %v\n", httpMethod, absolutePath, handlerName, nuHandlers)
 	}

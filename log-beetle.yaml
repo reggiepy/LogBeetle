@@ -9,4 +9,5 @@ LogConfig: # 日志配置
   Compress: false # 是否压缩旧日志文件
   LogLevel: info # 日志等级
   LogFormat: json # 日志等级 JSON | logfmt
-LogPath: ./logs
+ConsumerConfig:
+  LogPath: ./logs

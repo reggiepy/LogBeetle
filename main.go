@@ -4,9 +4,9 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/reggiepy/LogBeetle/middleware"
 	"github.com/reggiepy/LogBeetle/pkg/config"
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
+	"github.com/reggiepy/LogBeetle/pkg/logger"
 	"github.com/reggiepy/LogBeetle/pkg/nsqworker"
 	"github.com/reggiepy/LogBeetle/pkg/worker"
 	"github.com/reggiepy/LogBeetle/web"
@@ -24,7 +24,7 @@ func init() {
 	// 初始化配置
 	conf := config.Init(*configFile)
 
-	err := middleware.InitLogger(conf)
+	err := logger.InitLogger(conf)
 	if err != nil {
 		panic(err)
 	}
