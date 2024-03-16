@@ -1,5 +1,5 @@
 Env: prod # 环境，线上环境：prod、测试环境：dev
-BaseUrl: http://127.0.0.1:1233 # 网站域名
+BaseUrl: "http://127.0.0.1:1233" # 网站域名
 Port: 1233 # 端口
 LogConfig: # 日志配置
   LogFile: ./logs/log-beetle.log # 日志文件名
@@ -12,5 +12,5 @@ LogConfig: # 日志配置
 ConsumerConfig:
   LogPath: ./logs
 NSQConfig:
-  AuthSecret: %n&yFA2JD85z^g
-  NSQDAddress: 192.168.1.110:4150
+  AuthSecret: "%n&yFA2JD85z^g"
+  NSQDAddress: "192.168.1.110:4150"
