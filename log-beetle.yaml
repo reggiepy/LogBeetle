@@ -11,3 +11,6 @@ LogConfig: # 日志配置
   LogFormat: json # 日志等级 JSON | logfmt
 ConsumerConfig:
   LogPath: ./logs
+NSQConfig:
+  AuthSecret: %n&yFA2JD85z^g
+  NSQDAddress: 192.168.1.110:4150

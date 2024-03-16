@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"github.com/natefinch/lumberjack"
 	"github.com/nsqio/go-nsq"
+	"github.com/reggiepy/LogBeetle/pkg/config"
 	"github.com/reggiepy/LogBeetle/pkg/nsqworker"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"path"
 )
 
 type LogConsumer struct {
@@ -20,8 +22,10 @@ type LogConsumer struct {
 
 func NewLogConsumer(name string, nsqConfig nsqworker.ConsumerConfig, fileName string) *LogConsumer {
 	// 创建 lumberjack.Logger 实例用于日志切割
+	consumerConfig := config.Instance.ConsumerConfig
+	filePath := path.Join(consumerConfig.LogPath, fileName)
 	logFile := &lumberjack.Logger{
-		Filename:   fileName, // 日志文件名
+		Filename:   filePath, // 日志文件名
 		MaxSize:    1,        // 日志文件大小限制，单位为 MB
 		MaxBackups: 5,        // 最大保留的旧日志文件数量
 		MaxAge:     30,       // 旧日志文件保留天数

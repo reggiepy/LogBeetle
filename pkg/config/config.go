@@ -1,8 +1,6 @@
 package config
 
 import (
-	"fmt"
-	"gopkg.in/yaml.v2"
 	"os"
 	"reflect"
 )
@@ -28,6 +26,11 @@ type Config struct {
 	ConsumerConfig struct {
 		LogPath string `yaml:"LogPath"` //日志输出路径
 	} `yaml:"ConsumerConfig"`
+
+	NSQConfig struct {
+		AuthSecret  string `yaml:"AuthSecret"`  // 权限
+		NSQDAddress string `yaml:"NSQDAddress"` // 地址
+	} `yaml:"NSQConfig"`
 }
 
 func DefaultConfig() *Config {
@@ -46,6 +49,9 @@ func DefaultConfig() *Config {
 	config.LogConfig.LogFormat = "json"
 
 	config.ConsumerConfig.LogPath = "./logs"
+
+	config.NSQConfig.AuthSecret = "%n&yFA2JD85z^g"
+	config.NSQConfig.NSQDAddress = "127.0.0.1:4150"
 
 	return config
 }

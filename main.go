@@ -56,8 +56,7 @@ func main() {
 	var wg sync.WaitGroup
 	router := web.SetupRouter()
 
-	authSecret := "%n&yFA2JD85z^g"
-	address := "192.168.1.110:4150"
+	nsqConfig := config.Instance.NSQConfig
 	workers := []*worker.Worker{
 		worker.NewWorker(
 			worker.WithName("webserver"),
@@ -85,15 +84,15 @@ func main() {
 			}),
 			worker.WithStart(func() {
 				nsqworker.InitProducer(nsqworker.ProducerConfig{
-					Address:    address,
-					AuthSecret: authSecret,
+					Address:    nsqConfig.NSQDAddress,
+					AuthSecret: nsqConfig.AuthSecret,
 				})
 				consumer.AddConsumer(
 					consumer.NewLogConsumer(
 						"test",
 						nsqworker.ConsumerConfig{
-							Address:    address,
-							AuthSecret: authSecret,
+							Address:    nsqConfig.NSQDAddress,
+							AuthSecret: nsqConfig.AuthSecret,
 							Topic:      "test",
 							Channel:    "test_channel",
 						}, "test.log"),
@@ -102,8 +101,8 @@ func main() {
 					consumer.NewLogConsumer(
 						"chemical_db",
 						nsqworker.ConsumerConfig{
-							Address:    address,
-							AuthSecret: authSecret,
+							Address:    nsqConfig.NSQDAddress,
+							AuthSecret: nsqConfig.AuthSecret,
 							Topic:      "chemical-db",
 							Channel:    "test_channel",
 						}, "chemical_db.log"),
