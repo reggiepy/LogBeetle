@@ -11,6 +11,12 @@ LogConfig: # 日志配置
   LogFormat: json # 日志等级 JSON | logfmt
 ConsumerConfig:
   LogPath: ./logs
+  Consumers:
+    - Name: "chemical_db"
+      Topic: "chemical-db"
+      Channel: "consumer"
+      FileName: "chemical_db.log"
+
 NSQConfig:
   AuthSecret: "%n&yFA2JD85z^g"
   NSQDAddress: "192.168.1.110:4150"

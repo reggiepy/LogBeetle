@@ -57,6 +57,7 @@ func main() {
 	router := web.SetupRouter()
 
 	nsqConfig := config.Instance.NSQConfig
+	consumerConfig := config.Instance.ConsumerConfig
 	workers := []*worker.Worker{
 		worker.NewWorker(
 			worker.WithName("webserver"),
@@ -97,16 +98,19 @@ func main() {
 							Channel:    "test_channel",
 						}, "test.log"),
 				)
-				consumer.AddConsumer(
-					consumer.NewLogConsumer(
-						"chemical_db",
-						nsqworker.ConsumerConfig{
-							Address:    nsqConfig.NSQDAddress,
-							AuthSecret: nsqConfig.AuthSecret,
-							Topic:      "chemical-db",
-							Channel:    "test_channel",
-						}, "chemical_db.log"),
-				)
+				for _, consumerConfig := range consumerConfig.Consumers {
+					fmt.Println(consumerConfig)
+					consumer.AddConsumer(
+						consumer.NewLogConsumer(
+							consumerConfig.Name,
+							nsqworker.ConsumerConfig{
+								Address:    nsqConfig.NSQDAddress,
+								AuthSecret: nsqConfig.AuthSecret,
+								Topic:      consumerConfig.Topic,
+								Channel:    consumerConfig.Channel,
+							}, consumerConfig.FileName),
+					)
+				}
 			}),
 		),
 	}
