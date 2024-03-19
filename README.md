@@ -43,6 +43,8 @@ go run build github.com/reggiepy/LogBeetle/cmd/cli
 ```
 ## Architecture
 
+![image-20240319173321991](README.assets/image-20240319173321991.png)
+
 ```Mermaid
 sequenceDiagram
     participant Client
