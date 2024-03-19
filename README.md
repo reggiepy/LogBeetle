@@ -1,7 +1,7 @@
 # LogBeetle
 
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/reggiepy/LogBeetle?style=flat&color=success)
-[![release](https://img.shields.io/github/v/tag/reggiepy/LogBeetle?color=success&label=release)](https://github.com/reggiepy/LogBeetle)
+![GitHub Tag](https://img.shields.io/github/v/tag/reggiepy/LogBeetle?style=flat&color=success)
 [![build status](https://img.shields.io/badge/build-pass-success.svg?style=flat)](https://github.com/reggiepy/LogBeetle)
 [![License](https://img.shields.io/badge/license-GNU%203.0-success.svg?style=flat)](https://github.com/reggiepy/LogBeetle)
 [![Go Report Card](https://goreportcard.com/badge/github.com/reggiepy/LogBeetle)](https://goreportcard.com/report/github.com/reggiepy/LogBeetle)
