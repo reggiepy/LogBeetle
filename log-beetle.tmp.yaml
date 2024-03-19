@@ -12,11 +12,11 @@ LogConfig: # 日志配置
 ConsumerConfig:
   LogPath: ./logs
   Consumers:
-    - Name: "chemical_db"
-      Topic: "chemical-db"
-      Channel: "consumer"
-      FileName: "chemical_db.log"
+    - Name: "test"
+      Topic: "test"
+      Channel: "test"
+      FileName: "test.log"
 
 NSQConfig:
-  AuthSecret: "%n&yFA2JD85z^g"
-  NSQDAddress: "192.168.1.110:4150"
+  AuthSecret: ""
+  NSQDAddress: ""

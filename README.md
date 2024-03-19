@@ -30,4 +30,15 @@ build cli
 go run build github.com/reggiepy/LogBeetle/cmd/cli
 ```
 
+编译cli
+```bash
+cd cmd\cli
+go run .
+go build .
+```
+
+编译cli
+```bash
+go run build github.com/reggiepy/LogBeetle/cmd/cli
+```
 ## Architecture

@@ -45,7 +45,6 @@ func InitLogger(cfg *config.Config) (err error) {
 	zap.ReplaceGlobals(Logger) // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()调用即可
 	//zap.L().Debug("")
 	//zap.S().Debugf("")
-	Logger.Info("hhhhfadsfsd")
 	return
 }
 
