@@ -1,10 +1,10 @@
 # LogBeetle
 
-[![go version](https://img.shields.io/github/go-mod/go-version/reggiepy/LogBeetle?color=success&filename=go.mod&style=flat)](https://github.com/reggiepy/win_server_gen)
-[![release](https://img.shields.io/github/v/tag/reggiepy/win_server_gen?color=success&label=release)](https://github.com/reggiepy/win_server_gen)
-[![build status](https://img.shields.io/badge/build-pass-success.svg?style=flat)](https://github.com/reggiepy/win_server_gen)
-[![License](https://img.shields.io/badge/license-GNU%203.0-success.svg?style=flat)](https://github.com/reggiepy/win_server_gen)
-[![Go Report Card](https://goreportcard.com/badge/github.com/reggiepy/win_server_gen)](https://goreportcard.com/report/github.com/reggiepy/win_server_gen)
+[![go version](https://img.shields.io/github/go-mod/go-version/reggiepy/LogBeetle?color=success&filename=go.mod&style=flat)](https://github.com/reggiepy/LogBeetle)
+[![release](https://img.shields.io/github/v/tag/reggiepy/LogBeetle?color=success&label=release)](https://github.com/reggiepy/LogBeetle)
+[![build status](https://img.shields.io/badge/build-pass-success.svg?style=flat)](https://github.com/reggiepy/LogBeetle)
+[![License](https://img.shields.io/badge/license-GNU%203.0-success.svg?style=flat)](https://github.com/reggiepy/LogBeetle)
+[![Go Report Card](https://goreportcard.com/badge/github.com/reggiepy/LogBeetle)](https://goreportcard.com/report/github.com/reggiepy/LogBeetle)
 
 ## Installation
 
