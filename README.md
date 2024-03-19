@@ -42,3 +42,20 @@ go build .
 go run build github.com/reggiepy/LogBeetle/cmd/cli
 ```
 ## Architecture
+
+```Mermaid
+sequenceDiagram
+    participant Client
+    participant HTTP
+    participant NSQ
+    participant LogBeetle
+    Client-->>HTTP: Client send request to send log as a message
+    loop HealthCheck
+        LogBeetle->>LogBeetle: Consumers lookup nsq topic message
+    end
+    HTTP-->>NSQ: Send log to nsq topic
+    Note right of LogBeetle: Consumer to handle log by nsq topic
+    NSQ-->>LogBeetle: LogBeetle Consumer write log to file
+
+```
+
