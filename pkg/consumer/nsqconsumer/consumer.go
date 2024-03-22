@@ -1,11 +1,11 @@
-package nsqworker
+package nsqconsumer
 
 import (
 	"github.com/nsqio/go-nsq"
 	"log"
 )
 
-type ConsumerConfig struct {
+type NsqConsumerConfig struct {
 	Topic      string
 	Channel    string
 	Address    string
@@ -13,7 +13,7 @@ type ConsumerConfig struct {
 	Handler    *MessageHandler
 }
 
-func NewConsumer(config ConsumerConfig) *nsq.Consumer {
+func NewNsqConsumer(config NsqConsumerConfig) *nsq.Consumer {
 	cfg := nsq.NewConfig()
 	if config.AuthSecret != "" {
 		if err := cfg.Set("auth_secret", config.AuthSecret); err != nil {

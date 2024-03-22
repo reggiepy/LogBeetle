@@ -1,4 +1,4 @@
-package nsqworker
+package nsqconsumer
 
 import (
 	"github.com/nsqio/go-nsq"

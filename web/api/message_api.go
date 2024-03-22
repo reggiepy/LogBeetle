@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/reggiepy/LogBeetle/pkg/nsqworker"
+	"github.com/reggiepy/LogBeetle/pkg/producer/nsqproducer"
 	"net/http"
 	"time"
 )
@@ -38,7 +38,7 @@ func SendMessageHandler(c *gin.Context) {
 	}
 	start := time.Now()
 	// 向 NSQ 发送消息
-	err := nsqworker.Producer.Publish(project_name, []byte(message))
+	err := nsqproducer.Producer.Publish(project_name, []byte(message))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to send message to NSQ",

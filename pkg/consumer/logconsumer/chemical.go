@@ -1,11 +1,11 @@
-package consumer
+package logconsumer
 
 import (
 	"fmt"
 	"github.com/natefinch/lumberjack"
 	"github.com/nsqio/go-nsq"
 	"github.com/reggiepy/LogBeetle/pkg/config"
-	"github.com/reggiepy/LogBeetle/pkg/nsqworker"
+	"github.com/reggiepy/LogBeetle/pkg/consumer/nsqconsumer"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"path"
@@ -13,14 +13,14 @@ import (
 
 type LogConsumer struct {
 	Name      string
-	NsqConfig nsqworker.ConsumerConfig
+	NsqConfig nsqconsumer.NsqConsumerConfig
 	LogFile   *lumberjack.Logger
 	//Logger    zerolog.Logger
 	Logger2  *zap.Logger
 	Consumer *nsq.Consumer
 }
 
-func NewLogConsumer(name string, nsqConfig nsqworker.ConsumerConfig, fileName string) *LogConsumer {
+func NewLogConsumer(name string, nsqConfig nsqconsumer.NsqConsumerConfig, fileName string) *LogConsumer {
 	// 创建 lumberjack.Logger 实例用于日志切割
 	consumerConfig := config.Instance.ConsumerConfig
 	filePath := path.Join(consumerConfig.LogPath, fileName)
@@ -59,10 +59,10 @@ func NewLogConsumer(name string, nsqConfig nsqworker.ConsumerConfig, fileName st
 		//Logger:  logger,
 		Logger2: logger2,
 	}
-	nsqConfig.Handler = &nsqworker.MessageHandler{
+	nsqConfig.Handler = &nsqconsumer.MessageHandler{
 		Handler: c.Handler,
 	}
-	consumer := nsqworker.NewConsumer(nsqConfig)
+	consumer := nsqconsumer.NewNsqConsumer(nsqConfig)
 	c.Consumer = consumer
 	return c
 }

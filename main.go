@@ -5,9 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"github.com/reggiepy/LogBeetle/pkg/config"
-	"github.com/reggiepy/LogBeetle/pkg/consumer"
+	"github.com/reggiepy/LogBeetle/pkg/consumer/logconsumer"
+	"github.com/reggiepy/LogBeetle/pkg/consumer/nsqconsumer"
 	"github.com/reggiepy/LogBeetle/pkg/logger"
-	"github.com/reggiepy/LogBeetle/pkg/nsqworker"
+	"github.com/reggiepy/LogBeetle/pkg/producer/nsqproducer"
 	"github.com/reggiepy/LogBeetle/pkg/worker"
 	"github.com/reggiepy/LogBeetle/web"
 	"os"
@@ -80,18 +81,18 @@ func main() {
 			worker.WithCtx(ctx),
 			worker.WithWg(&wg),
 			worker.WithStop(func() {
-				nsqworker.StopProducer()
-				consumer.StopConsumers()
+				nsqproducer.StopProducer()
+				logconsumer.StopConsumers()
 			}),
 			worker.WithStart(func() {
-				nsqworker.InitProducer(nsqworker.ProducerConfig{
+				nsqproducer.InitProducer(nsqproducer.ProducerConfig{
 					Address:    nsqConfig.NSQDAddress,
 					AuthSecret: nsqConfig.AuthSecret,
 				})
-				consumer.AddConsumer(
-					consumer.NewLogConsumer(
+				logconsumer.AddConsumer(
+					logconsumer.NewLogConsumer(
 						"test",
-						nsqworker.ConsumerConfig{
+						nsqconsumer.NsqConsumerConfig{
 							Address:    nsqConfig.NSQDAddress,
 							AuthSecret: nsqConfig.AuthSecret,
 							Topic:      "test",
@@ -100,10 +101,10 @@ func main() {
 				)
 				for _, consumerConfig := range consumerConfig.Consumers {
 					fmt.Println(consumerConfig)
-					consumer.AddConsumer(
-						consumer.NewLogConsumer(
+					logconsumer.AddConsumer(
+						logconsumer.NewLogConsumer(
 							consumerConfig.Name,
-							nsqworker.ConsumerConfig{
+							nsqconsumer.NsqConsumerConfig{
 								Address:    nsqConfig.NSQDAddress,
 								AuthSecret: nsqConfig.AuthSecret,
 								Topic:      consumerConfig.Topic,
