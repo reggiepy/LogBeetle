@@ -61,7 +61,7 @@ func DefaultConfig() *Config {
 	config.ConsumerConfig.LogPath = "./logs"
 	config.ConsumerConfig.Consumers = make([]Consumer, 0)
 
-	config.NSQConfig.AuthSecret = "%n&yFA2JD85z^g"
+	config.NSQConfig.AuthSecret = ""
 	config.NSQConfig.NSQDAddress = "127.0.0.1:4150"
 
 	return config
