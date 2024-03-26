@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -187,4 +188,24 @@ func Init(filename string) *Config {
 	}
 	setDefaults(Instance)
 	return Instance
+}
+
+func ShowConfig(format string) error {
+	var jsonData []byte
+	var err error
+	switch format {
+	case "simple":
+		// 将结构体序列化为 JSON
+		jsonData, err = json.Marshal(Instance)
+	case "humanReadable":
+		// 将结构体序列化为 JSON
+		jsonData, err = json.MarshalIndent(Instance, "", "    ")
+	default:
+		return fmt.Errorf("不支持的format类型: %s", format)
+	}
+	if err != nil {
+		return fmt.Errorf("配置信息json序列化失败: %v", err)
+	}
+	fmt.Println(string(jsonData))
+	return nil
 }

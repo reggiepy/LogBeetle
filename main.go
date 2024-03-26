@@ -27,9 +27,14 @@ func init() {
 
 	err := logger.InitLogger(conf)
 	if err != nil {
-		panic(err)
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
-	fmt.Println(conf)
+	err = config.ShowConfig("simple")
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 }
 
 // @title           Swagger Example API
