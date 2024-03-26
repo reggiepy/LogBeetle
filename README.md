@@ -39,7 +39,7 @@ go build .
 
 build cli
 ```bash
-go run build github.com/reggiepy/LogBeetle/cmd/cli
+go build github.com/reggiepy/LogBeetle/cmd/cli
 ```
 ## Architecture
 

@@ -1,7 +1,6 @@
 package sub
 
 import (
-	"fmt"
 	"github.com/reggiepy/LogBeetle/pkg/config"
 	"github.com/spf13/cobra"
 	"os"
@@ -33,8 +32,7 @@ var rootCmd = cobra.Command{
 
 func initConfig() {
 	// 初始化配置
-	conf := config.Init(configFile)
-	fmt.Println(conf)
+	config.Init(configFile)
 }
 
 func Execute() {
