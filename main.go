@@ -30,11 +30,6 @@ func init() {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	err = config.ShowConfig("simple")
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
 }
 
 // @title           Swagger Example API
