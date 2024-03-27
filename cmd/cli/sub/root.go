@@ -1,4 +1,4 @@
-package cmd
+package sub
 
 import (
 	"fmt"
@@ -22,9 +22,17 @@ func init() {
 	viper.SetEnvPrefix("lb") // 设置环境变量前缀
 	viper.SetDefault("config", "./log-beetle.yaml")
 	viper.AutomaticEnv() // 自动加载环境变量
+
+	// 在初始化时调用initConfig函数
 	cobra.OnInitialize(initConfig)
+
+	// 设置全局标志
 	rootCmd.PersistentFlags().BoolVarP(&showVersion, "version", "v", false, "show version information")
+
+	// 添加命令行参数
 	rootCmd.Flags().StringP("config", "c", "", "config file")
+
+	// 将命令行参数与Viper绑定
 	_ = viper.BindPFlag("config", rootCmd.Flags().Lookup("config"))
 }
 

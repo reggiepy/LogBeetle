@@ -16,28 +16,17 @@ go mod tidy
 
 ## Usage
 
-```bash
-go run main.go
-```
-
 generate swagger UI
 ```bash
 swag init -g cmd/log-writer/main.go
 ```
 
-build cli
+run
 ```bash
-go build github.com/reggiepy/LogBeetle/cmd/LogBeetle
+go run github.com/reggiepy/LogBeetle/cmd/LogBeetle server
 ```
 
-build cli
-```bash
-cd cmd\cli
-go run .
-go build .
-```
-
-build cli
+build
 ```bash
 go build github.com/reggiepy/LogBeetle/cmd/LogBeetle
 ```
