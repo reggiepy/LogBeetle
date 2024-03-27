@@ -129,13 +129,20 @@ func serverStart() {
 	// 创建一个上下文，以便能够在主程序退出时取消所有 Goroutine
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
 	// 使用 WaitGroup 等待所有 Goroutine 结束
 	var wg sync.WaitGroup
+
+	// 设置路由
 	router := web.SetupRouter()
 
+	// 获取配置
 	nsqConfig := config.Instance.NSQConfig
 	consumerConfig := config.Instance.ConsumerConfig
+
+	// 定义工作线程
 	workers := []*worker.Worker{
+		// Web 服务器
 		worker.NewWorker(
 			worker.WithName("webserver"),
 			worker.WithCtx(ctx),
@@ -152,6 +159,7 @@ func serverStart() {
 				}()
 			}),
 		),
+		// NSQ 生产者和消费者
 		worker.NewWorker(
 			worker.WithName("nsqProducer"),
 			worker.WithCtx(ctx),
@@ -161,10 +169,13 @@ func serverStart() {
 				logconsumer.StopConsumers()
 			}),
 			worker.WithStart(func() {
+				// 初始化 NSQ 生产者
 				nsqproducer.InitProducer(nsqproducer.ProducerConfig{
 					Address:    nsqConfig.NSQDAddress,
 					AuthSecret: nsqConfig.AuthSecret,
 				})
+
+				// 添加日志消费者
 				logconsumer.AddConsumer(
 					logconsumer.NewLogConsumer(
 						"test",
@@ -175,8 +186,9 @@ func serverStart() {
 							Channel:    "test_channel",
 						}, "test.log"),
 				)
+
+				// 添加其他消费者
 				for _, consumerConfig := range consumerConfig.Consumers {
-					fmt.Println(consumerConfig)
 					logconsumer.AddConsumer(
 						logconsumer.NewLogConsumer(
 							consumerConfig.Name,
@@ -191,17 +203,20 @@ func serverStart() {
 			}),
 		),
 	}
+
+	// 启动工作线程
 	for _, w := range workers {
 		wg.Add(1)
 		w.Run()
 	}
+
 	// 捕获信号，以优雅地退出程序
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	<-sigCh
+
 	// 取消所有 Goroutine
 	cancel()
-
 	wg.Wait()
 
 	fmt.Println("Main program stopped")
