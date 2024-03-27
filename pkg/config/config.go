@@ -182,9 +182,10 @@ func isEmptyValue(value reflect.Value) bool {
 func Init(filename string) *Config {
 	Instance = &Config{}
 	if yamlFile, err := os.ReadFile(filename); err != nil {
-		fmt.Println(err)
+		_, _ = fmt.Fprintf(os.Stderr, err.Error())
+
 	} else if err = yaml.Unmarshal(yamlFile, Instance); err != nil {
-		fmt.Println(err)
+		_, _ = fmt.Fprintf(os.Stderr, err.Error())
 	}
 	setDefaults(Instance)
 	return Instance

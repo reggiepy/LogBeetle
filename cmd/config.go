@@ -1,4 +1,4 @@
-package sub
+package cmd
 
 import (
 	"fmt"
@@ -7,14 +7,13 @@ import (
 	"os"
 )
 
-var (
-	configFormat = NewEnum([]string{"humanReadable", "simple"}, "humanReadable")
-)
-
 func init() {
 	rootCmd.AddCommand(configCmd)
 	configCmd.AddCommand(configShowCmd)
 	configShowCmd.Flags().Var(configFormat, "format", "humanReadable | simple")
+	configCmd.ValidArgsFunction = func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"json", "simple"}, cobra.ShellCompDirectiveNoFileComp
+	}
 }
 
 var configCmd = &cobra.Command{

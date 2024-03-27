@@ -27,7 +27,7 @@ swag init -g cmd/log-writer/main.go
 
 build cli
 ```bash
-go run build github.com/reggiepy/LogBeetle/cmd/cli
+go build github.com/reggiepy/LogBeetle/cmd/LogBeetle
 ```
 
 build cli
@@ -39,7 +39,7 @@ go build .
 
 build cli
 ```bash
-go build github.com/reggiepy/LogBeetle/cmd/cli
+go build github.com/reggiepy/LogBeetle/cmd/LogBeetle
 ```
 ## Architecture
 
