@@ -1,6 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 ### Example user template
 *.log
+!.gitkeep
 log-beetle.yaml
 # IntelliJ project files
 .idea
