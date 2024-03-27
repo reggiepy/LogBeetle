@@ -1,0 +1,89 @@
+definitions:
+  model.AboutResponse:
+    properties:
+      title:
+        type: string
+    type: object
+  model.JSONResult:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /log-beetle/v1/:
+    get:
+      consumes:
+      - text/plain
+      description: 首页
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.AboutResponse'
+      summary: 首页
+      tags:
+      - 管理
+  /log-beetle/v1/about:
+    get:
+      consumes:
+      - text/plain
+      description: 关于
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: 关于
+      tags:
+      - 管理
+  /log-beetle/v1/ping:
+    get:
+      consumes:
+      - text/plain
+      description: ping
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: ping
+      tags:
+      - 管理
+  /log-beetle/v1/send-message:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 发送消息到nsq
+      parameters:
+      - description: message
+        in: formData
+        name: message
+        required: true
+        type: string
+      - description: project_name
+        in: formData
+        name: project_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.JSONResult'
+      summary: 发送消息
+      tags:
+      - 消息管理
+swagger: "2.0"
