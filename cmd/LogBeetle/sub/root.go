@@ -6,6 +6,7 @@ import (
 	"github.com/reggiepy/LogBeetle/pkg/config"
 	"github.com/reggiepy/LogBeetle/pkg/consumer/logconsumer"
 	"github.com/reggiepy/LogBeetle/pkg/consumer/nsqconsumer"
+	"github.com/reggiepy/LogBeetle/pkg/convert"
 	"github.com/reggiepy/LogBeetle/pkg/logger"
 	"github.com/reggiepy/LogBeetle/pkg/producer/nsqproducer"
 	"github.com/reggiepy/LogBeetle/pkg/worker"
@@ -58,7 +59,8 @@ var rootCmd = cobra.Command{
 	Version: "",
 	Run: func(cmd *cobra.Command, args []string) {
 		_ = config.ShowConfig("simple")
-		err := logger.InitLogger(config.Instance)
+		loggerConfig, err := convert.ConfigToLoggerConfig(config.Instance)
+		err = logger.InitLogger(*loggerConfig)
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
@@ -183,7 +185,6 @@ func serverStart() {
 							Address:    nsqConfig.NSQDAddress,
 							AuthSecret: nsqConfig.AuthSecret,
 							Topic:      "test",
-							Channel:    "test_channel",
 						}, "test.log"),
 				)
 
@@ -196,7 +197,6 @@ func serverStart() {
 								Address:    nsqConfig.NSQDAddress,
 								AuthSecret: nsqConfig.AuthSecret,
 								Topic:      consumerConfig.Topic,
-								Channel:    consumerConfig.Channel,
 							}, consumerConfig.FileName),
 					)
 				}

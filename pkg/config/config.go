@@ -13,7 +13,6 @@ var Instance *Config
 type Consumer struct {
 	Name     string `yaml:"Name"`
 	Topic    string `yaml:"Topic"`
-	Channel  string `yaml:"Channel"`
 	FileName string `yaml:"FileName"`
 }
 

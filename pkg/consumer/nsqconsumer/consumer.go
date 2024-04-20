@@ -7,7 +7,6 @@ import (
 
 type NsqConsumerConfig struct {
 	Topic      string
-	Channel    string
 	Address    string
 	AuthSecret string
 	Handler    *MessageHandler
@@ -20,7 +19,7 @@ func NewNsqConsumer(config NsqConsumerConfig) *nsq.Consumer {
 			log.Fatalf("Failed to set auth_secret: %v", err)
 		}
 	}
-	consumer, err := nsq.NewConsumer(config.Topic, config.Channel, cfg)
+	consumer, err := nsq.NewConsumer(config.Topic, "consumer", cfg)
 	if err != nil {
 		log.Fatalf("Failed to create NSQ Consumer: %v", err)
 	}
