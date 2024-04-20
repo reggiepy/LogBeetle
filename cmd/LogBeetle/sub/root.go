@@ -3,6 +3,11 @@ package sub
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+
 	"github.com/reggiepy/LogBeetle/pkg/config"
 	"github.com/reggiepy/LogBeetle/pkg/consumer/logconsumer"
 	"github.com/reggiepy/LogBeetle/pkg/consumer/nsqconsumer"
@@ -13,15 +18,9 @@ import (
 	"github.com/reggiepy/LogBeetle/web"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
-	"os/signal"
-	"sync"
-	"syscall"
 )
 
 var (
-	//配置文件
-	configFile  string
 	showVersion bool
 )
 
@@ -57,6 +56,9 @@ var rootCmd = cobra.Command{
 	Short:   "LogBeetle help",
 	Long:    `LogBeetle help`,
 	Version: "",
+	Args: func(cmd *cobra.Command, args []string) error {
+		return nil
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		_ = config.ShowConfig("simple")
 		loggerConfig, err := convert.ConfigToLoggerConfig(config.Instance)
@@ -136,7 +138,6 @@ func serverStart() {
 			worker.WithCtx(ctx),
 			worker.WithWg(&wg),
 			worker.WithStop(func() {
-
 			}),
 			worker.WithStart(func() {
 				go func() {
