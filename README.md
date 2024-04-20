@@ -18,10 +18,10 @@ go mod tidy
 
 generate swagger UI
 ```bash
-swag init -g cmd/log-writer/main.go
+swag init -g cmd/LogBeetle/main.go
 ```
 
-run
+runs
 ```bash
 go run github.com/reggiepy/LogBeetle/cmd/LogBeetle server
 ```

@@ -110,23 +110,6 @@ func Execute() {
 	}
 }
 
-// @title           Swagger Example API
-// @version         1.0
-// @description     This is a sample server celler server.
-// @termsOfService  http://swagger.io/terms/
-
-// @contact.name   API Support
-// @contact.url    http://www.swagger.io/support
-// @contact.email  support@swagger.io
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8080
-// @BasePath  /api/v1
-
-// @externalDocs.description  OpenAPI
-// @externalDocs.url          https://swagger.io/resources/open-api/
 func serverStart() {
 	// 创建一个上下文，以便能够在主程序退出时取消所有 Goroutine
 	ctx, cancel := context.WithCancel(context.Background())
@@ -141,6 +124,9 @@ func serverStart() {
 	// 获取配置
 	nsqConfig := config.Instance.NSQConfig
 	consumerConfig := config.Instance.ConsumerConfig
+	if len(consumerConfig.NSQConsumers) == 0 {
+		_ = fmt.Errorf("consumer config is empty")
+	}
 
 	// 定义工作线程
 	workers := []*worker.Worker{
@@ -189,7 +175,7 @@ func serverStart() {
 				)
 
 				// 添加其他消费者
-				for _, consumerConfig := range consumerConfig.Consumers {
+				for _, consumerConfig := range consumerConfig.NSQConsumers {
 					logconsumer.AddConsumer(
 						logconsumer.NewLogConsumer(
 							consumerConfig.Name,

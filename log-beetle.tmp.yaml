@@ -11,7 +11,7 @@ LogConfig: # 日志配置
   LogFormat: json # 日志等级 JSON | logfmt
 ConsumerConfig:
   LogPath: ./logs
-  Consumers:
+  NSQConsumers:
     - Name: "test"
       Topic: "test"
       FileName: "test.log"

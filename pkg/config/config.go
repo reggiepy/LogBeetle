@@ -10,7 +10,7 @@ import (
 
 var Instance *Config
 
-type Consumer struct {
+type NSQConsumers struct {
 	Name     string `yaml:"Name"`
 	Topic    string `yaml:"Topic"`
 	FileName string `yaml:"FileName"`
@@ -33,8 +33,8 @@ type Config struct {
 	} `yaml:"LogConfig"`
 
 	ConsumerConfig struct {
-		LogPath   string     `yaml:"LogPath"` //日志输出路径
-		Consumers []Consumer `yaml:"Consumers"`
+		LogPath      string         `yaml:"LogPath"` //日志输出路径
+		NSQConsumers []NSQConsumers `yaml:"NSQConsumers"`
 	} `yaml:"ConsumerConfig"`
 
 	NSQConfig struct {
@@ -59,7 +59,7 @@ func DefaultConfig() *Config {
 	config.LogConfig.LogFormat = "json"
 
 	config.ConsumerConfig.LogPath = "./logs"
-	config.ConsumerConfig.Consumers = make([]Consumer, 0)
+	config.ConsumerConfig.NSQConsumers = make([]NSQConsumers, 0)
 
 	config.NSQConfig.AuthSecret = ""
 	config.NSQConfig.NSQDAddress = "127.0.0.1:4150"
@@ -138,7 +138,7 @@ func setStructDefaults(config, defaultConfig interface{}) {
 		field := configValue.Field(i)
 
 		// 如果字段是切片类型，则递归处理每个元素
-		if configValue.Type().Field(i).Name == "Consumers" && field.Kind() == reflect.Slice {
+		if configValue.Type().Field(i).Name == "NSQConsumers" && field.Kind() == reflect.Slice {
 			// 删除目标配置中的空切片以及空元素
 			var updatedSlice reflect.Value
 			updatedSlice = reflect.MakeSlice(field.Type(), 0, 0)
