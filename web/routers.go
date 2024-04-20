@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/reggiepy/LogBeetle/docs"
 	"github.com/reggiepy/LogBeetle/middleware"
+	"github.com/reggiepy/LogBeetle/pkg/config"
 	"github.com/reggiepy/LogBeetle/pkg/logger"
 	"github.com/reggiepy/LogBeetle/web/api"
 	swaggerFiles "github.com/swaggo/files"
@@ -37,7 +38,11 @@ func SetupRouter() *gin.Engine {
 	r.GET("/log-beetle/v1/ping", api.PingHandler)
 	r.GET("/log-beetle/v1/about", api.AboutHandler)
 	r.POST("/log-beetle/v1/send-message", api.SendMessageHandler)
-	// use ginSwagger middleware to serve the API docs
-	r.GET("/log-beetle/v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	if config.Instance.Env == "dev" {
+		// use ginSwagger middleware to serve the API docs
+		r.GET("/log-beetle/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	return r
 }

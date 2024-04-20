@@ -51,7 +51,7 @@ func DefaultConfig() *Config {
 	config.Port = 1233
 	config.LogPath = "logs"
 
-	config.LogConfig.LogFile = "app.log"
+	config.LogConfig.LogFile = "./logs/log-beetle.log"
 	config.LogConfig.MaxSize = 1    // 默认值为 100 MB
 	config.LogConfig.MaxBackups = 5 // 默认值为 10
 	config.LogConfig.MaxAge = 30    // 默认值为 30 天
