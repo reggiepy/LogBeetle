@@ -36,7 +36,7 @@ func (w *Worker) Run() {
 				fmt.Printf("【%s】Worker stopped\n", w.Options.Name)
 				w.Options.Stop()
 				return
-				//default:
+				// default:
 				//	// 在这里执行具体的工作
 			}
 		}

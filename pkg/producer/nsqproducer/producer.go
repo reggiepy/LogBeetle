@@ -1,9 +1,10 @@
 package nsqproducer
 
 import (
-	"github.com/nsqio/go-nsq"
 	"log"
 	"sync"
+
+	"github.com/nsqio/go-nsq"
 )
 
 var (

@@ -2,10 +2,11 @@ package api
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/reggiepy/LogBeetle/pkg/producer/nsqproducer"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/reggiepy/LogBeetle/pkg/producer/nsqproducer"
 )
 
 // @Summary 发送消息
@@ -29,8 +30,8 @@ func SendMessageHandler(c *gin.Context) {
 		return
 	}
 	// 从请求体中获取消息内容
-	project_name := c.DefaultPostForm("project_name", "test")
-	if project_name == "" {
+	projectName := c.DefaultPostForm("project_name", "test")
+	if projectName == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "project_name cannot be empty",
 		})
@@ -38,18 +39,18 @@ func SendMessageHandler(c *gin.Context) {
 	}
 	start := time.Now()
 	// 向 NSQ 发送消息
-	err := nsqproducer.Producer.Publish(project_name, []byte(message))
+	err := nsqproducer.Producer.Publish(projectName, []byte(message))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Failed to send message to NSQ",
+			"message": "Failed to send message",
 		})
 		return
 	}
 	end := time.Now()
 	elapsed := end.Sub(start)
-	fmt.Printf("函数运行时间：%s\n", elapsed)
+	fmt.Printf("topic【%s】消息写入时间：%s\n", projectName, elapsed)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Message sent to NSQ successfully",
+		"message": "Message send successfully",
 	})
 }

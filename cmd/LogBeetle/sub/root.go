@@ -164,28 +164,33 @@ func serverStart() {
 					AuthSecret: nsqConfig.AuthSecret,
 				})
 
-				// 添加日志消费者
-				logconsumer.AddConsumer(
-					logconsumer.NewLogConsumer(
-						"test",
-						nsqconsumer.NsqConsumerConfig{
-							Address:    nsqConfig.NSQDAddress,
-							AuthSecret: nsqConfig.AuthSecret,
-							Topic:      "test",
-						}, "test.log"),
+				nc := nsqconsumer.NewNsqConsumer(
+					"test",
+					nsqConfig.NSQDAddress,
+					nsqconsumer.WithAuthSecret(nsqConfig.AuthSecret),
 				)
+				c := logconsumer.NewLogConsumer(
+					"test",
+					"test.log",
+					nc,
+				)
+				// 添加日志消费者
+				logconsumer.AddConsumer(c)
 
 				// 添加其他消费者
 				for _, consumerConfig := range consumerConfig.NSQConsumers {
-					logconsumer.AddConsumer(
-						logconsumer.NewLogConsumer(
-							consumerConfig.Name,
-							nsqconsumer.NsqConsumerConfig{
-								Address:    nsqConfig.NSQDAddress,
-								AuthSecret: nsqConfig.AuthSecret,
-								Topic:      consumerConfig.Topic,
-							}, consumerConfig.FileName),
+					nc := nsqconsumer.NewNsqConsumer(
+						consumerConfig.Topic,
+						nsqConfig.NSQDAddress,
+						nsqconsumer.WithAuthSecret(nsqConfig.AuthSecret),
 					)
+					c := logconsumer.NewLogConsumer(
+						consumerConfig.Name,
+						consumerConfig.FileName,
+						nc,
+					)
+					// 添加日志消费者
+					logconsumer.AddConsumer(c)
 				}
 			}),
 		),

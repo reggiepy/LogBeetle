@@ -1,8 +1,9 @@
 package nsqconsumer
 
 import (
-	"github.com/nsqio/go-nsq"
 	"sync"
+
+	"github.com/nsqio/go-nsq"
 )
 
 var (

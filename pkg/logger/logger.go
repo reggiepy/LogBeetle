@@ -1,10 +1,11 @@
 package logger
 
 import (
+	"reflect"
+
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"reflect"
 )
 
 var Logger *zap.Logger
@@ -132,8 +133,8 @@ func InitLogger(logConfig Config, options ...ConfigOption) (err error) {
 	// 2. 使用 logger 的时候 直接通过 zap.S().Debugf("xxx") or zap.L().Debug("xxx")
 	// 3. 使用 zap.S() 和 zap.L() 提供全局锁，保证一个全局的安全访问logger的方式
 	zap.ReplaceGlobals(Logger) // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()调用即可
-	//zap.L().Debug("")
-	//zap.S().Debugf("")
+	// zap.L().Debug("")
+	// zap.S().Debugf("")
 	return
 }
 

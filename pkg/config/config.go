@@ -3,9 +3,10 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"os"
 	"reflect"
+
+	"gopkg.in/yaml.v2"
 )
 
 var Instance *Config
@@ -33,7 +34,7 @@ type Config struct {
 	} `yaml:"LogConfig"`
 
 	ConsumerConfig struct {
-		LogPath      string         `yaml:"LogPath"` //日志输出路径
+		LogPath      string         `yaml:"LogPath"` // 日志输出路径
 		NSQConsumers []NSQConsumers `yaml:"NSQConsumers"`
 	} `yaml:"ConsumerConfig"`
 
@@ -182,7 +183,6 @@ func Init(filename string) *Config {
 	Instance = &Config{}
 	if yamlFile, err := os.ReadFile(filename); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, err.Error())
-
 	} else if err = yaml.Unmarshal(yamlFile, Instance); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, err.Error())
 	}
