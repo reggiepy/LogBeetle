@@ -4,6 +4,7 @@ import (
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"reflect"
 )
 
 var Logger *zap.Logger
@@ -91,6 +92,15 @@ func NewDefaultConfig() *Config {
 
 // InitLogger 初始化Logger
 func InitLogger(logConfig Config, options ...ConfigOption) (err error) {
+	if reflect.DeepEqual(logConfig, Config{}) {
+		logConfig = *NewDefaultConfig()
+	}
+	for _, option := range options {
+		err := option(&logConfig)
+		if err != nil {
+			panic(err)
+		}
+	}
 	logLevel := map[string]zapcore.Level{
 		"debug": zapcore.DebugLevel,
 		"info":  zapcore.InfoLevel,
