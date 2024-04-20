@@ -36,6 +36,11 @@ func SetupRouter() *gin.Engine {
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 	// 创建路由引擎
 	//r := gin.Default()
+	if config.Instance.Env == "dev" {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	r := gin.New()
 	r.Use(middleware.GinLogger(logger.Logger), middleware.GinRecovery(logger.Logger, true))
 	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
@@ -54,8 +59,6 @@ func SetupRouter() *gin.Engine {
 	if config.Instance.Env == "dev" {
 		// use ginSwagger middleware to serve the API docs
 		r.GET("/log-beetle/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	} else {
-		gin.SetMode(gin.ReleaseMode)
 	}
 	return r
 }
