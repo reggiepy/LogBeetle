@@ -3,14 +3,13 @@ package sub
 import (
 	"context"
 	"fmt"
-	"github.com/reggiepy/LogBeetle/pkg/consumer/consumer"
+	"github.com/reggiepy/LogBeetle/pkg/consumer"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
 	"github.com/reggiepy/LogBeetle/pkg/config"
-	"github.com/reggiepy/LogBeetle/pkg/consumer/nsqconsumer"
 	"github.com/reggiepy/LogBeetle/pkg/convert"
 	"github.com/reggiepy/LogBeetle/pkg/logger"
 	"github.com/reggiepy/LogBeetle/pkg/producer/nsqproducer"
@@ -164,12 +163,12 @@ func serverStart() {
 					AuthSecret: nsqConfig.AuthSecret,
 				})
 
-				nc := nsqconsumer.NewNsqConsumer(
+				nc := consumer.NewNsqConsumer(
 					"test",
 					nsqConfig.NSQDAddress,
-					nsqconsumer.WithAuthSecret(nsqConfig.AuthSecret),
+					consumer.WithAuthSecret(nsqConfig.AuthSecret),
 				)
-				c := nsqconsumer.NewNSQLogConsumer(
+				c := consumer.NewNSQLogConsumer(
 					"test",
 					"test.log",
 					nc,
@@ -179,12 +178,12 @@ func serverStart() {
 
 				// 添加其他消费者
 				for _, consumerConfig := range consumerConfig.NSQConsumers {
-					nc := nsqconsumer.NewNsqConsumer(
+					nc := consumer.NewNsqConsumer(
 						consumerConfig.Topic,
 						nsqConfig.NSQDAddress,
-						nsqconsumer.WithAuthSecret(nsqConfig.AuthSecret),
+						consumer.WithAuthSecret(nsqConfig.AuthSecret),
 					)
-					c := nsqconsumer.NewNSQLogConsumer(
+					c := consumer.NewNSQLogConsumer(
 						consumerConfig.Name,
 						consumerConfig.FileName,
 						nc,
