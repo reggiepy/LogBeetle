@@ -2,7 +2,11 @@ package nsqconsumer
 
 import (
 	"fmt"
+	"github.com/reggiepy/LogBeetle/pkg/config"
+	"go.uber.org/zap"
+	"io"
 	"log"
+	"path"
 
 	"github.com/nsqio/go-nsq"
 )
@@ -43,7 +47,7 @@ func NewNsqConsumer(topic string, address string, opts ...Options) *NsqConsumer 
 	for _, opt := range opts {
 		err := opt(n)
 		if err != nil {
-			panic(err)
+			panic(err.(any))
 		}
 	}
 	cfg := nsq.NewConfig()
@@ -53,11 +57,11 @@ func NewNsqConsumer(topic string, address string, opts ...Options) *NsqConsumer 
 		}
 	}
 	if n.Topic == "" {
-		panic("Topic is not set when creating consumer")
+		panic(fmt.Errorf("topic is not set when creating consumer").(any))
 	}
 	n.Consumer, err = nsq.NewConsumer(n.Topic, "consumer", cfg)
 	if err != nil {
-		log.Fatalf("Failed to create NSQ Consumer: %v", err)
+		panic(fmt.Errorf("failed to create NSQ Consumer: %v", err).(any))
 	}
 
 	for _, h := range n.Handlers {
@@ -81,4 +85,62 @@ func (n *NsqConsumer) Connect() error {
 
 func (n *NsqConsumer) Stop() {
 	n.Consumer.Stop()
+}
+
+type NSQLogConsumer struct {
+	Name        string
+	LogFileName string
+	LogFile     io.WriteCloser
+	// Logger    zerolog.Logger
+	Logger *zap.Logger
+
+	// Consumer
+	Consumer *NsqConsumer
+}
+
+func (c *NSQLogConsumer) Close() {
+	var err error
+	if c.LogFile != nil {
+		fmt.Printf("关闭 【%s】 Consumer LogFile\n", c.Name)
+		err = c.Logger.Sync()
+		if err != nil {
+			fmt.Printf("Sync 【%s】  Logger 失败: %v", c.Name, err)
+		}
+		err = c.LogFile.Close()
+		if err != nil {
+			fmt.Printf("关闭 【%s】 日志文件失败: %v", c.Name, err)
+		}
+	}
+	if c.Consumer != nil {
+		fmt.Printf("关闭 【%s】 Consumer Consumer\n", c.Name)
+		c.Consumer.Stop()
+	}
+}
+
+func NewNSQLogConsumer(name string, logFileName string, consumer *NsqConsumer) *NSQLogConsumer {
+	c := &NSQLogConsumer{
+		Name:        name,
+		LogFileName: logFileName,
+		Consumer:    consumer,
+	}
+	// 创建 lumberjack.Logger 实例用于日志切割
+	consumerConfig := config.Instance.ConsumerConfig
+	filePath := path.Join(consumerConfig.LogPath, c.LogFileName)
+	c.LogFile = NewLJLoggerWriteCloser(filePath)
+
+	//logger := NewZEROLogger(c.LogFile)
+
+	// 创建Logger
+	c.Logger = NewZAPLogger(c.LogFile)
+	c.Consumer.AddHandler(&MessageHandler{
+		Handler: func(message []byte) error {
+			c.Logger.Info(string(message))
+			return nil
+		},
+	})
+	err := c.Consumer.Connect()
+	if err != nil {
+		panic((err).(any))
+	}
+	return c
 }

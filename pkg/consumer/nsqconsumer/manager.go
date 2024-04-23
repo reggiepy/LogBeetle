@@ -2,25 +2,23 @@ package nsqconsumer
 
 import (
 	"sync"
-
-	"github.com/nsqio/go-nsq"
 )
 
 var (
-	nsqs []*nsq.Consumer
-	mu   sync.Mutex
+	consumers []LogBeetleConsumer
+	mu        sync.Mutex
 )
 
 func StopConsumers() {
 	mu.Lock()
 	defer mu.Unlock()
-	for _, c := range nsqs {
-		c.Stop()
+	for _, c := range consumers {
+		c.Close()
 	}
 }
 
-func AddConsumer(c *nsq.Consumer) {
+func AddConsumer(c LogBeetleConsumer) {
 	mu.Lock()
 	defer mu.Unlock()
-	nsqs = append(nsqs, c)
+	consumers = append(consumers, c)
 }

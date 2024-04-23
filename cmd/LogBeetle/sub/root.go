@@ -9,7 +9,6 @@ import (
 	"syscall"
 
 	"github.com/reggiepy/LogBeetle/pkg/config"
-	"github.com/reggiepy/LogBeetle/pkg/consumer/logconsumer"
 	"github.com/reggiepy/LogBeetle/pkg/consumer/nsqconsumer"
 	"github.com/reggiepy/LogBeetle/pkg/convert"
 	"github.com/reggiepy/LogBeetle/pkg/logger"
@@ -155,7 +154,7 @@ func serverStart() {
 			worker.WithWg(&wg),
 			worker.WithStop(func() {
 				nsqproducer.StopProducer()
-				logconsumer.StopConsumers()
+				nsqconsumer.StopConsumers()
 			}),
 			worker.WithStart(func() {
 				// 初始化 NSQ 生产者
@@ -169,13 +168,13 @@ func serverStart() {
 					nsqConfig.NSQDAddress,
 					nsqconsumer.WithAuthSecret(nsqConfig.AuthSecret),
 				)
-				c := logconsumer.NewLogConsumer(
+				c := nsqconsumer.NewNSQLogConsumer(
 					"test",
 					"test.log",
 					nc,
 				)
 				// 添加日志消费者
-				logconsumer.AddConsumer(c)
+				nsqconsumer.AddConsumer(c)
 
 				// 添加其他消费者
 				for _, consumerConfig := range consumerConfig.NSQConsumers {
@@ -184,13 +183,13 @@ func serverStart() {
 						nsqConfig.NSQDAddress,
 						nsqconsumer.WithAuthSecret(nsqConfig.AuthSecret),
 					)
-					c := logconsumer.NewLogConsumer(
+					c := nsqconsumer.NewNSQLogConsumer(
 						consumerConfig.Name,
 						consumerConfig.FileName,
 						nc,
 					)
 					// 添加日志消费者
-					logconsumer.AddConsumer(c)
+					nsqconsumer.AddConsumer(c)
 				}
 			}),
 		),

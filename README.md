@@ -29,6 +29,14 @@ go run github.com/reggiepy/LogBeetle/cmd/LogBeetle server
 build
 ```bash
 go build github.com/reggiepy/LogBeetle/cmd/LogBeetle
+go build -ldflags="-s -w" github.com/reggiepy/LogBeetle/cmd/LogBeetle
+```
+
+build linux
+```bash
+go env -w CGO_ENABLED=0 GOOS=linux GOARCH=amd64
+go build github.com/reggiepy/LogBeetle/cmd/LogBeetle
+go build -ldflags="-s -w" github.com/reggiepy/LogBeetle/cmd/LogBeetle
 ```
 ## Architecture
 
