@@ -2,90 +2,13 @@ package consumer
 
 import (
 	"fmt"
+	"github.com/nsqio/go-nsq"
 	"github.com/reggiepy/LogBeetle/pkg/config"
+	"github.com/reggiepy/LogBeetle/pkg/util/struct_utils"
 	"go.uber.org/zap"
 	"io"
-	"log"
 	"path"
-
-	"github.com/nsqio/go-nsq"
 )
-
-type NsqConsumer struct {
-	Topic      string
-	Address    string
-	AuthSecret string
-	Handlers   []*MessageHandler
-
-	Consumer *nsq.Consumer
-}
-
-type Options func(n *NsqConsumer) error
-
-// WithAuthSecret 设置NSQ消费者的认证秘钥
-func WithAuthSecret(authSecret string) Options {
-	return func(n *NsqConsumer) error {
-		n.AuthSecret = authSecret
-		return nil
-	}
-}
-
-// WithHandlers 设置NSQ消费者的消息处理器
-func WithHandlers(handlers []*MessageHandler) Options {
-	return func(n *NsqConsumer) error {
-		n.Handlers = append(n.Handlers, handlers...)
-		return nil
-	}
-}
-
-func NewNsqConsumer(topic string, address string, opts ...Options) *NsqConsumer {
-	var err error
-	n := &NsqConsumer{
-		Topic:   topic,
-		Address: address,
-	}
-	for _, opt := range opts {
-		err := opt(n)
-		if err != nil {
-			panic(err.(any))
-		}
-	}
-	cfg := nsq.NewConfig()
-	if n.AuthSecret != "" {
-		if err := cfg.Set("auth_secret", n.AuthSecret); err != nil {
-			log.Fatalf("Failed to set auth_secret: %v", err)
-		}
-	}
-	if n.Topic == "" {
-		panic(fmt.Errorf("topic is not set when creating consumer").(any))
-	}
-	n.Consumer, err = nsq.NewConsumer(n.Topic, "consumer", cfg)
-	if err != nil {
-		panic(fmt.Errorf("failed to create NSQ Consumer: %v", err).(any))
-	}
-
-	for _, h := range n.Handlers {
-		n.AddHandler(h)
-	}
-
-	return n
-}
-
-func (n *NsqConsumer) AddHandler(handle *MessageHandler) {
-	n.Consumer.AddHandler(handle)
-}
-
-func (n *NsqConsumer) Connect() error {
-	err := n.Consumer.ConnectToNSQD(n.Address)
-	if err != nil {
-		return fmt.Errorf("连接NSQ失败:%v", err)
-	}
-	return nil
-}
-
-func (n *NsqConsumer) Stop() {
-	n.Consumer.Stop()
-}
 
 type NSQLogConsumer struct {
 	Name        string
@@ -95,7 +18,68 @@ type NSQLogConsumer struct {
 	Logger *zap.Logger
 
 	// Consumer
-	Consumer *NsqConsumer
+	NSQTopic      string
+	NSQAddress    string
+	NSQAuthSecret string
+	NSQConsumer   *nsq.Consumer
+}
+
+type Options func(n *NSQLogConsumer) error
+
+// WithAuthSecret 设置NSQ消费者的认证秘钥
+func WithNSQAuthSecret(authSecret string) Options {
+	return func(n *NSQLogConsumer) error {
+		n.NSQAuthSecret = authSecret
+		return nil
+	}
+}
+
+// WithName 设置NSQ消费者的名称
+func WithName(name string) Options {
+	return func(n *NSQLogConsumer) error {
+		n.Name = name
+		return nil
+	}
+}
+
+// WithLogFileName 设置NSQ消费者的日志文件名
+func WithLogFileName(logFileName string) Options {
+	return func(n *NSQLogConsumer) error {
+		n.LogFileName = logFileName
+		return nil
+	}
+}
+
+// WithLogFile 设置NSQ消费者的日志文件
+func WithLogFile(logFile io.WriteCloser) Options {
+	return func(n *NSQLogConsumer) error {
+		n.LogFile = logFile
+		return nil
+	}
+}
+
+// WithLogger 设置NSQ消费者的日志记录器
+func WithLogger(logger *zap.Logger) Options {
+	return func(n *NSQLogConsumer) error {
+		n.Logger = logger
+		return nil
+	}
+}
+
+// WithNSQTopic 设置NSQ消费者的主题
+func WithNSQTopic(topic string) Options {
+	return func(n *NSQLogConsumer) error {
+		n.NSQTopic = topic
+		return nil
+	}
+}
+
+// WithNSQAddress 设置NSQ消费者的地址
+func WithNSQAddress(address string) Options {
+	return func(n *NSQLogConsumer) error {
+		n.NSQAddress = address
+		return nil
+	}
 }
 
 func (c *NSQLogConsumer) Close() {
@@ -111,36 +95,57 @@ func (c *NSQLogConsumer) Close() {
 			fmt.Printf("关闭 【%s】 日志文件失败: %v", c.Name, err)
 		}
 	}
-	if c.Consumer != nil {
+	if c.NSQConsumer != nil {
 		fmt.Printf("关闭 【%s】 Consumer Consumer\n", c.Name)
-		c.Consumer.Stop()
+		c.NSQConsumer.Stop()
 	}
 }
 
-func NewNSQLogConsumer(name string, logFileName string, consumer *NsqConsumer) *NSQLogConsumer {
-	c := &NSQLogConsumer{
-		Name:        name,
-		LogFileName: logFileName,
-		Consumer:    consumer,
+func NewNSQLogConsumer(opts ...Options) (*NSQLogConsumer, error) {
+	logConsumer := &NSQLogConsumer{}
+	for _, opt := range opts {
+		err := opt(logConsumer)
+		if err != nil {
+			panic(err.(any))
+		}
 	}
+	status, err := struct_utils.IsEmptyStringField(logConsumer, "NSQTopic", "NSQAddress", "LogFileName", "Name")
+	if err != nil {
+		return nil, err
+	}
+	if status {
+		return nil, fmt.Errorf("")
+	}
+	cfg := nsq.NewConfig()
+	if logConsumer.NSQAuthSecret != "" {
+		if err := cfg.Set("auth_secret", logConsumer.NSQAuthSecret); err != nil {
+			return nil, fmt.Errorf("failed to set auth_secret: %v", err)
+		}
+	}
+
+	consumer, err := nsq.NewConsumer(logConsumer.NSQTopic, "consumer", cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create NSQ Consumer: %v", err)
+	}
+	logConsumer.NSQConsumer = consumer
 	// 创建 lumberjack.Logger 实例用于日志切割
 	consumerConfig := config.Instance.ConsumerConfig
-	filePath := path.Join(consumerConfig.LogPath, c.LogFileName)
-	c.LogFile = NewLJLoggerWriteCloser(filePath)
+	filePath := path.Join(consumerConfig.LogPath, logConsumer.LogFileName)
+	logConsumer.LogFile = NewLJLoggerWriteCloser(filePath)
 
 	//logger := NewZEROLogger(c.LogFile)
 
 	// 创建Logger
-	c.Logger = NewZAPLogger(c.LogFile)
-	c.Consumer.AddHandler(&MessageHandler{
+	logConsumer.Logger = NewZAPLogger(logConsumer.LogFile)
+	logConsumer.NSQConsumer.AddHandler(&MessageHandler{
 		Handler: func(message []byte) error {
-			c.Logger.Info(string(message))
+			logConsumer.Logger.Info(string(message))
 			return nil
 		},
 	})
-	err := c.Consumer.Connect()
+	err = logConsumer.NSQConsumer.ConnectToNSQD(logConsumer.NSQAddress)
 	if err != nil {
-		panic((err).(any))
+		return nil, fmt.Errorf("连接NSQ失败:%v", err)
 	}
-	return c
+	return logConsumer, nil
 }

@@ -2,6 +2,7 @@ package struct_utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 )
 
@@ -94,4 +95,33 @@ func StructToMap(data interface{}) map[string]interface{} {
 		return nil
 	}
 	return result
+}
+
+// IsEmptyStringField 检查结构体中指定字段是否为空字符串
+func IsEmptyStringField(s interface{}, fields ...string) (bool, error) {
+	value := reflect.ValueOf(s)
+
+	// 检查s是否是指针类型，如果是，需要通过Elem()获取其实际值
+	if value.Kind() == reflect.Ptr {
+		value = value.Elem()
+	}
+
+	// 检查s是否是结构体类型
+	if value.Kind() != reflect.Struct {
+		return false, fmt.Errorf("参数必须是一个结构体或结构体指针")
+	}
+
+	// 遍历要检查的字段
+	for _, field := range fields {
+		// 获取字段的反射值
+		fieldValue := value.FieldByName(field)
+
+		// 如果字段是字符串类型并且为空字符串，则返回true
+		if fieldValue.Kind() == reflect.String && fieldValue.String() == "" {
+			return true, nil
+		}
+	}
+
+	// 没有发现空字符串字段
+	return false, nil
 }

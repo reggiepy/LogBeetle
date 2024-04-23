@@ -1,4 +1,4 @@
-package nsqproducer
+package producer
 
 import (
 	"log"
@@ -8,22 +8,22 @@ import (
 )
 
 var (
-	Producer *nsq.Producer
-	once     sync.Once
+	NSQProducer *nsq.Producer
+	once        sync.Once
 )
 
-type ProducerConfig struct {
+type NSQProducerConfig struct {
 	Address    string
 	AuthSecret string
 }
 
-func InitProducer(config ProducerConfig) {
+func InitNSQProducer(config NSQProducerConfig) {
 	once.Do(func() {
 		initProducer(config)
 	})
 }
 
-func initProducer(config ProducerConfig) {
+func initProducer(config NSQProducerConfig) {
 	cfg := nsq.NewConfig()
 	if config.AuthSecret != "" {
 		if err := cfg.Set("auth_secret", config.AuthSecret); err != nil {
@@ -31,14 +31,14 @@ func initProducer(config ProducerConfig) {
 		}
 	}
 	var err error
-	Producer, err = nsq.NewProducer(config.Address, cfg)
+	NSQProducer, err = nsq.NewProducer(config.Address, cfg)
 	if err != nil {
 		log.Fatalf("Failed to create NSQ Producer: %v", err)
 	}
 }
 
 func StopProducer() {
-	if Producer != nil {
-		Producer.Stop()
+	if NSQProducer != nil {
+		NSQProducer.Stop()
 	}
 }

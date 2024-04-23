@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
+	"github.com/reggiepy/LogBeetle/pkg/producer"
 	"os"
 	"os/signal"
 	"sync"
@@ -12,7 +13,6 @@ import (
 	"github.com/reggiepy/LogBeetle/pkg/config"
 	"github.com/reggiepy/LogBeetle/pkg/convert"
 	"github.com/reggiepy/LogBeetle/pkg/logger"
-	"github.com/reggiepy/LogBeetle/pkg/producer/nsqproducer"
 	"github.com/reggiepy/LogBeetle/pkg/worker"
 	"github.com/reggiepy/LogBeetle/web"
 	"github.com/spf13/cobra"
@@ -153,41 +153,41 @@ func serverStart() {
 			worker.WithCtx(ctx),
 			worker.WithWg(&wg),
 			worker.WithStop(func() {
-				nsqproducer.StopProducer()
+				producer.StopProducer()
 				consumer.StopConsumers()
 			}),
 			worker.WithStart(func() {
 				// 初始化 NSQ 生产者
-				nsqproducer.InitProducer(nsqproducer.ProducerConfig{
+				producer.InitNSQProducer(producer.NSQProducerConfig{
 					Address:    nsqConfig.NSQDAddress,
 					AuthSecret: nsqConfig.AuthSecret,
 				})
 
-				nc := consumer.NewNsqConsumer(
-					"test",
-					nsqConfig.NSQDAddress,
-					consumer.WithAuthSecret(nsqConfig.AuthSecret),
+				c, err := consumer.NewNSQLogConsumer(
+					consumer.WithName("test"),
+					consumer.WithLogFileName("test.log"),
+					consumer.WithNSQTopic("test"),
+					consumer.WithNSQAddress(nsqConfig.NSQDAddress),
+					consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
 				)
-				c := consumer.NewNSQLogConsumer(
-					"test",
-					"test.log",
-					nc,
-				)
+				if err != nil {
+					fmt.Printf("error creating consumer %s: %v\n", "test", err)
+				}
 				// 添加日志消费者
 				consumer.AddConsumer(c)
 
 				// 添加其他消费者
 				for _, consumerConfig := range consumerConfig.NSQConsumers {
-					nc := consumer.NewNsqConsumer(
-						consumerConfig.Topic,
-						nsqConfig.NSQDAddress,
-						consumer.WithAuthSecret(nsqConfig.AuthSecret),
+					c, err := consumer.NewNSQLogConsumer(
+						consumer.WithName(consumerConfig.Name),
+						consumer.WithLogFileName(consumerConfig.FileName),
+						consumer.WithNSQTopic(consumerConfig.Topic),
+						consumer.WithNSQAddress(nsqConfig.NSQDAddress),
+						consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
 					)
-					c := consumer.NewNSQLogConsumer(
-						consumerConfig.Name,
-						consumerConfig.FileName,
-						nc,
-					)
+					if err != nil {
+						fmt.Printf("error creating consumer %s: %v\n", consumerConfig.Topic, err)
+					}
 					// 添加日志消费者
 					consumer.AddConsumer(c)
 				}
