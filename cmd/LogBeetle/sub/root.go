@@ -3,6 +3,7 @@ package sub
 import (
 	"context"
 	"fmt"
+	"github.com/reggiepy/LogBeetle/pkg/consumer/consumer"
 	"os"
 	"os/signal"
 	"sync"
@@ -154,7 +155,7 @@ func serverStart() {
 			worker.WithWg(&wg),
 			worker.WithStop(func() {
 				nsqproducer.StopProducer()
-				nsqconsumer.StopConsumers()
+				consumer.StopConsumers()
 			}),
 			worker.WithStart(func() {
 				// 初始化 NSQ 生产者
@@ -174,7 +175,7 @@ func serverStart() {
 					nc,
 				)
 				// 添加日志消费者
-				nsqconsumer.AddConsumer(c)
+				consumer.AddConsumer(c)
 
 				// 添加其他消费者
 				for _, consumerConfig := range consumerConfig.NSQConsumers {
@@ -189,7 +190,7 @@ func serverStart() {
 						nc,
 					)
 					// 添加日志消费者
-					nsqconsumer.AddConsumer(c)
+					consumer.AddConsumer(c)
 				}
 			}),
 		),

@@ -1,4 +1,4 @@
-package nsqconsumer
+package consumer
 
 type LogBeetleConsumer interface {
 	Close()

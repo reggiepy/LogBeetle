@@ -1,4 +1,4 @@
-package nsqconsumer
+package consumer
 
 import (
 	"sync"
