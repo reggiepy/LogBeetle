@@ -2,9 +2,10 @@ package sub
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/reggiepy/LogBeetle/pkg/config"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func init() {

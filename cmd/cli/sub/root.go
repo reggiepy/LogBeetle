@@ -2,15 +2,16 @@ package sub
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/reggiepy/LogBeetle/pkg/config"
 	"github.com/reggiepy/LogBeetle/pkg/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 )
 
 var (
-	//配置文件
+	// 配置文件
 	configFile  string
 	showVersion bool
 
