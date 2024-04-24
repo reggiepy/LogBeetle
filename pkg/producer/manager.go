@@ -1,4 +1,4 @@
-package consumer
+package producer
 
 import (
 	"fmt"
@@ -6,14 +6,14 @@ import (
 )
 
 type Manager struct {
-	consumers []LogBeetleConsumer
+	producers []LogBeetleProducer
 	mux       sync.Mutex
 }
 
 func (m *Manager) Stop() {
 	m.mux.Lock()
 	defer m.mux.Unlock()
-	for _, c := range m.consumers {
+	for _, c := range m.producers {
 		err := c.Close()
 		if err != nil {
 			fmt.Println(err)
@@ -21,12 +21,12 @@ func (m *Manager) Stop() {
 	}
 }
 
-func (m *Manager) Add(c LogBeetleConsumer) {
+func (m *Manager) Add(c LogBeetleProducer) {
 	m.mux.Lock()
 	defer m.mux.Unlock()
-	m.consumers = append(m.consumers, c)
+	m.producers = append(m.producers, c)
 }
 
-func NewLogBeetleConsumerManager() *Manager {
+func NewLogBeetleProducerManager() *Manager {
 	return &Manager{}
 }

@@ -2,13 +2,16 @@ package consumer
 
 import (
 	"fmt"
+	"io"
+	"path"
+
 	"github.com/nsqio/go-nsq"
 	"github.com/reggiepy/LogBeetle/pkg/config"
 	"github.com/reggiepy/LogBeetle/pkg/util/struct_utils"
 	"go.uber.org/zap"
-	"io"
-	"path"
 )
+
+var Topics []string
 
 type NSQLogConsumer struct {
 	Name        string
@@ -22,6 +25,30 @@ type NSQLogConsumer struct {
 	NSQAddress    string
 	NSQAuthSecret string
 	NSQConsumer   *nsq.Consumer
+}
+
+func (c *NSQLogConsumer) Close() error {
+	var err error
+	if c.LogFile != nil {
+		fmt.Printf("关闭 【%s】 Consumer LogFile\n", c.Name)
+		err = c.Logger.Sync()
+		if err != nil {
+			return fmt.Errorf("Sync 【%s】  Logger 失败: %v", c.Name, err)
+		}
+		err = c.LogFile.Close()
+		if err != nil {
+			return fmt.Errorf("关闭 【%s】 日志文件失败: %v", c.Name, err)
+		}
+	}
+	if c.NSQConsumer != nil {
+		fmt.Printf("关闭 【%s】 Consumer NSQConsumer\n", c.Name)
+		c.NSQConsumer.Stop()
+	}
+	return nil
+}
+
+func (c *NSQLogConsumer) RegisterTopic(topic ...string) {
+	Topics = append(Topics, topic...)
 }
 
 type Options func(n *NSQLogConsumer) error
@@ -82,70 +109,52 @@ func WithNSQAddress(address string) Options {
 	}
 }
 
-func (c *NSQLogConsumer) Close() {
-	var err error
-	if c.LogFile != nil {
-		fmt.Printf("关闭 【%s】 Consumer LogFile\n", c.Name)
-		err = c.Logger.Sync()
-		if err != nil {
-			fmt.Printf("Sync 【%s】  Logger 失败: %v", c.Name, err)
-		}
-		err = c.LogFile.Close()
-		if err != nil {
-			fmt.Printf("关闭 【%s】 日志文件失败: %v", c.Name, err)
-		}
-	}
-	if c.NSQConsumer != nil {
-		fmt.Printf("关闭 【%s】 Consumer Consumer\n", c.Name)
-		c.NSQConsumer.Stop()
-	}
-}
-
 func NewNSQLogConsumer(opts ...Options) (*NSQLogConsumer, error) {
-	logConsumer := &NSQLogConsumer{}
+	c := &NSQLogConsumer{}
 	for _, opt := range opts {
-		err := opt(logConsumer)
+		err := opt(c)
 		if err != nil {
 			panic(err.(any))
 		}
 	}
-	status, err := struct_utils.IsEmptyStringField(logConsumer, "NSQTopic", "NSQAddress", "LogFileName", "Name")
+	status, err := struct_utils.IsEmptyStringField(c, "NSQTopic", "NSQAddress", "LogFileName", "Name")
 	if err != nil {
 		return nil, err
 	}
 	if status {
-		return nil, fmt.Errorf("")
+		return nil, fmt.Errorf("%v", err)
 	}
 	cfg := nsq.NewConfig()
-	if logConsumer.NSQAuthSecret != "" {
-		if err := cfg.Set("auth_secret", logConsumer.NSQAuthSecret); err != nil {
+	if c.NSQAuthSecret != "" {
+		if err := cfg.Set("auth_secret", c.NSQAuthSecret); err != nil {
 			return nil, fmt.Errorf("failed to set auth_secret: %v", err)
 		}
 	}
 
-	consumer, err := nsq.NewConsumer(logConsumer.NSQTopic, "consumer", cfg)
+	consumer, err := nsq.NewConsumer(c.NSQTopic, "consumer", cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create NSQ Consumer: %v", err)
 	}
-	logConsumer.NSQConsumer = consumer
+	c.NSQConsumer = consumer
 	// 创建 lumberjack.Logger 实例用于日志切割
 	consumerConfig := config.Instance.ConsumerConfig
-	filePath := path.Join(consumerConfig.LogPath, logConsumer.LogFileName)
-	logConsumer.LogFile = NewLJLoggerWriteCloser(filePath)
+	filePath := path.Join(consumerConfig.LogPath, c.LogFileName)
+	c.LogFile = NewLJLoggerWriteCloser(filePath)
 
-	//logger := NewZEROLogger(c.LogFile)
+	// logger := NewZEROLogger(c.LogFile)
 
 	// 创建Logger
-	logConsumer.Logger = NewZAPLogger(logConsumer.LogFile)
-	logConsumer.NSQConsumer.AddHandler(&MessageHandler{
+	c.Logger = NewZAPLogger(c.LogFile)
+	c.NSQConsumer.AddHandler(&MessageHandler{
 		Handler: func(message []byte) error {
-			logConsumer.Logger.Info(string(message))
+			c.Logger.Info(string(message))
 			return nil
 		},
 	})
-	err = logConsumer.NSQConsumer.ConnectToNSQD(logConsumer.NSQAddress)
+	err = c.NSQConsumer.ConnectToNSQD(c.NSQAddress)
 	if err != nil {
 		return nil, fmt.Errorf("连接NSQ失败:%v", err)
 	}
-	return logConsumer, nil
+	c.RegisterTopic(c.NSQTopic)
+	return c, nil
 }

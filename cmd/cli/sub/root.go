@@ -3,7 +3,7 @@ package sub
 import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/pkg/config"
-	"github.com/reggiepy/LogBeetle/pkg/util/version"
+	"github.com/reggiepy/LogBeetle/pkg/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"

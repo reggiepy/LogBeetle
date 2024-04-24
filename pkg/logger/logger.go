@@ -92,14 +92,14 @@ func NewDefaultConfig() *Config {
 }
 
 // InitLogger 初始化Logger
-func InitLogger(logConfig Config, options ...ConfigOption) (err error) {
+func InitLogger(logConfig Config, options ...ConfigOption) error {
 	if reflect.DeepEqual(logConfig, Config{}) {
 		logConfig = *NewDefaultConfig()
 	}
 	for _, option := range options {
 		err := option(&logConfig)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	}
 	logLevel := map[string]zapcore.Level{
@@ -135,7 +135,7 @@ func InitLogger(logConfig Config, options ...ConfigOption) (err error) {
 	zap.ReplaceGlobals(Logger) // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()调用即可
 	// zap.L().Debug("")
 	// zap.S().Debugf("")
-	return
+	return nil
 }
 
 func getEncoder(logFormat string) zapcore.Encoder {

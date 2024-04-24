@@ -118,7 +118,7 @@ func IsEmptyStringField(s interface{}, fields ...string) (bool, error) {
 
 		// 如果字段是字符串类型并且为空字符串，则返回true
 		if fieldValue.Kind() == reflect.String && fieldValue.String() == "" {
-			return true, nil
+			return true, fmt.Errorf("缺少参数: %s", fieldValue.String())
 		}
 	}
 

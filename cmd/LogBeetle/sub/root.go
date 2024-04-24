@@ -3,12 +3,13 @@ package sub
 import (
 	"context"
 	"fmt"
-	"github.com/reggiepy/LogBeetle/pkg/consumer"
-	"github.com/reggiepy/LogBeetle/pkg/producer"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/reggiepy/LogBeetle/pkg/consumer"
+	"github.com/reggiepy/LogBeetle/pkg/producer"
 
 	"github.com/reggiepy/LogBeetle/pkg/config"
 	"github.com/reggiepy/LogBeetle/pkg/convert"
@@ -19,9 +20,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	showVersion bool
-)
+var showVersion bool
 
 func init() {
 	// 使用Viper加载环境变量
@@ -61,12 +60,16 @@ var rootCmd = cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		_ = config.ShowConfig("simple")
 		loggerConfig, err := convert.ConfigToLoggerConfig(config.Instance)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
 		err = logger.InitLogger(*loggerConfig)
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
-		serverStart()
+		StartServer()
 	},
 }
 
@@ -111,7 +114,7 @@ func Execute() {
 	}
 }
 
-func serverStart() {
+func StartServer() {
 	// 创建一个上下文，以便能够在主程序退出时取消所有 Goroutine
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -128,6 +131,9 @@ func serverStart() {
 	if len(consumerConfig.NSQConsumers) == 0 {
 		_ = fmt.Errorf("consumer config is empty")
 	}
+
+	consumerManager := consumer.NewLogBeetleConsumerManager()
+	producerManager := producer.NewLogBeetleProducerManager()
 
 	// 定义工作线程
 	workers := []*worker.Worker{
@@ -149,19 +155,25 @@ func serverStart() {
 		),
 		// NSQ 生产者和消费者
 		worker.NewWorker(
-			worker.WithName("nsqProducer"),
+			worker.WithName("nsq worker"),
 			worker.WithCtx(ctx),
 			worker.WithWg(&wg),
 			worker.WithStop(func() {
-				producer.StopProducer()
-				consumer.StopConsumers()
+				producerManager.Stop()
+				consumerManager.Stop()
 			}),
 			worker.WithStart(func() {
 				// 初始化 NSQ 生产者
-				producer.InitNSQProducer(producer.NSQProducerConfig{
-					Address:    nsqConfig.NSQDAddress,
-					AuthSecret: nsqConfig.AuthSecret,
-				})
+				p, err := producer.NewNSQProducer(
+					producer.WithNSQAddress(nsqConfig.NSQDAddress),
+					producer.WithNSQAuthSecret(nsqConfig.AuthSecret),
+				)
+				if err != nil {
+					fmt.Printf("error creating producer: %v\n", err)
+				} else {
+					producerManager.Add(p)
+					producer.InitInstance(p)
+				}
 
 				c, err := consumer.NewNSQLogConsumer(
 					consumer.WithName("test"),
@@ -172,9 +184,9 @@ func serverStart() {
 				)
 				if err != nil {
 					fmt.Printf("error creating consumer %s: %v\n", "test", err)
+				} else {
+					consumerManager.Add(c)
 				}
-				// 添加日志消费者
-				consumer.AddConsumer(c)
 
 				// 添加其他消费者
 				for _, consumerConfig := range consumerConfig.NSQConsumers {
@@ -187,9 +199,9 @@ func serverStart() {
 					)
 					if err != nil {
 						fmt.Printf("error creating consumer %s: %v\n", consumerConfig.Topic, err)
+					} else {
+						consumerManager.Add(c)
 					}
-					// 添加日志消费者
-					consumer.AddConsumer(c)
 				}
 			}),
 		),

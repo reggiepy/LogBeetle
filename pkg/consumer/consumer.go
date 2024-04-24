@@ -1,5 +1,5 @@
 package consumer
 
 type LogBeetleConsumer interface {
-	Close()
+	Close() error
 }
