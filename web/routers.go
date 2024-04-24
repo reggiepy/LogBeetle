@@ -52,9 +52,9 @@ func SetupRouter() *gin.Engine {
 	r.Use(middleware.Cors())
 
 	// 定义路由和处理程序
-	r.GET("/log-beetle/v1/", api.HomeHandler)
-	r.GET("/log-beetle/v1/ping", api.PingHandler)
-	r.GET("/log-beetle/v1/about", api.AboutHandler)
+	r.GET("/log-beetle/", api.HomeHandler)
+	r.GET("/log-beetle/ping", api.PingHandler)
+	r.GET("/log-beetle/about", api.AboutHandler)
 	r.POST("/log-beetle/v1/send-message", api.SendMessageHandler)
 	if config.Instance.Env == "dev" {
 		// use ginSwagger middleware to serve the API docs

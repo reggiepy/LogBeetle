@@ -2,7 +2,9 @@ package api
 
 import (
 	"fmt"
+	"github.com/reggiepy/LogBeetle/pkg/consumer"
 	"github.com/reggiepy/LogBeetle/pkg/producer"
+	"github.com/reggiepy/LogBeetle/pkg/util/array_utils"
 	"net/http"
 	"time"
 
@@ -37,9 +39,15 @@ func SendMessageHandler(c *gin.Context) {
 		})
 		return
 	}
+	if !array_utils.InArray(projectName, consumer.Topics) {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "project_name is not allowed",
+		})
+		return
+	}
 	start := time.Now()
 	// 向 NSQ 发送消息
-	err := producer.NSQProducer.Publish(projectName, []byte(message))
+	err := producer.Instance.Publish(projectName, []byte(message))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Failed to send message",
