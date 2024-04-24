@@ -28,13 +28,20 @@ go run github.com/reggiepy/LogBeetle/cmd/LogBeetle server
 
 build
 ```bash
+SET CGO_ENABLED=0
+SET GOOS=windows
+SET GOARCH=amd64
+go env -w CGO_ENABLED=0 GOOS=windows  GOARCH=amd64
 go build github.com/reggiepy/LogBeetle/cmd/LogBeetle
 go build -ldflags="-s -w" github.com/reggiepy/LogBeetle/cmd/LogBeetle
 ```
 
 build linux
 ```bash
-go env -w CGO_ENABLED=0 GOOS=linux GOARCH=amd64
+SET CGO_ENABLED=0
+SET GOOS=linux
+SET GOARCH=amd64
+# go env -w CGO_ENABLED=0 GOOS=linux GOARCH=amd64
 go build github.com/reggiepy/LogBeetle/cmd/LogBeetle
 go build -ldflags="-s -w" github.com/reggiepy/LogBeetle/cmd/LogBeetle
 ```
