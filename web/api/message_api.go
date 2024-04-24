@@ -2,11 +2,12 @@ package api
 
 import (
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
 	"github.com/reggiepy/LogBeetle/pkg/producer"
 	"github.com/reggiepy/LogBeetle/pkg/util/array_utils"
-	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
