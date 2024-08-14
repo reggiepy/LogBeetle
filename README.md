@@ -31,7 +31,7 @@ build
 SET CGO_ENABLED=0
 SET GOOS=windows
 SET GOARCH=amd64
-go env -w CGO_ENABLED=0 GOOS=windows  GOARCH=amd64
+# go env -w CGO_ENABLED=0 GOOS=windows  GOARCH=amd64
 go build github.com/reggiepy/LogBeetle/cmd/LogBeetle
 go build -ldflags="-s -w" github.com/reggiepy/LogBeetle/cmd/LogBeetle
 ```

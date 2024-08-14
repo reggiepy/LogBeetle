@@ -5,8 +5,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// DddRequestID 是一个中间件函数，用于给每个请求添加一个request id
-func DddRequestID() gin.HandlerFunc {
+// RequestID 是一个中间件函数，用于给每个请求添加一个request id
+func RequestID() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 生成一个唯一的request id，并将其存储到Gin的上下文中
 		requestID := uuid.New().String()

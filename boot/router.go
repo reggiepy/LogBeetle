@@ -1,15 +1,13 @@
-package web
+package boot
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/reggiepy/LogBeetle/docs"
+	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/middleware"
-	"github.com/reggiepy/LogBeetle/pkg/config"
-	"github.com/reggiepy/LogBeetle/pkg/logger"
-	"github.com/reggiepy/LogBeetle/web/api"
+	"github.com/reggiepy/LogBeetle/router"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"log"
 )
 
 // SetupRouter 设置路由
@@ -26,7 +24,7 @@ import (
 // @BasePath  /api/v1
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
-func SetupRouter() *gin.Engine {
+func Router() *gin.Engine {
 	// programatically set swagger info
 	docs.SwaggerInfo.Title = "Log API"
 	docs.SwaggerInfo.Description = "This is a sample server Petstore server."
@@ -34,31 +32,45 @@ func SetupRouter() *gin.Engine {
 	docs.SwaggerInfo.Host = "127.0.0.1:1233"
 	docs.SwaggerInfo.BasePath = "/"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
-	// 创建路由引擎
-	//r := gin.Default()
-	if config.Instance.Env == "dev" {
+	if global.LbConfig.Env == "dev" {
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
 	}
+	//r := gin.Default()
 	r := gin.New()
-	r.Use(middleware.GinLogger(logger.Logger), middleware.GinRecovery(logger.Logger, true))
-	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
-		log.Printf("endpoint %v %v %v %v\n", httpMethod, absolutePath, handlerName, nuHandlers)
-	}
+
 	// 注册全局中间件
 	r.Use(middleware.ErrorHandler())
-	r.Use(middleware.DddRequestID())
+	r.Use(middleware.RequestID())
 	r.Use(middleware.Cors())
 
-	// 定义路由和处理程序
-	r.GET("/log-beetle/", api.HomeHandler)
-	r.GET("/log-beetle/ping", api.PingHandler)
-	r.GET("/log-beetle/about", api.AboutHandler)
-	r.POST("/log-beetle/v1/send-message", api.SendMessageHandler)
-	if config.Instance.Env == "dev" {
+	group := r.Group("log-beetle")
+	//Public route: starts with "public". There is no need to regroup or authenticate within the route
+	PublicGroup := group.Group("v1")
+	RouterPublic(PublicGroup)
+
+	//Private route：starts with "". The route is grouped according to the actual performance, and authentication is required
+	PrivateGroup := group.Group("")
+	// 注册全局中间件
+	RouterPrivate(PrivateGroup)
+	if global.LbConfig.Env == "dev" {
 		// use ginSwagger middleware to serve the API docs
 		r.GET("/log-beetle/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 	return r
+}
+
+func RouterPublic(PublicGroup *gin.RouterGroup) {
+	routerPublic := router.LbRouter.RouterPublic
+	{
+		routerPublic.RouterMessage.InitRouterMessage(PublicGroup)
+		routerPublic.RouterIndex.InitIndexRouter(PublicGroup)
+	}
+}
+
+func RouterPrivate(PrivateGroup *gin.RouterGroup) {
+	_ = router.LbRouter.RouterPrivate
+	//{
+	//}
 }

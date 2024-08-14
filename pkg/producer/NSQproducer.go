@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/nsqio/go-nsq"
-	"github.com/reggiepy/LogBeetle/pkg/util/struct_utils"
+	"github.com/reggiepy/LogBeetle/util/struct_utils"
 )
 
 var (

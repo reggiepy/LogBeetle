@@ -1,16 +1,12 @@
-package api
+package public
 
 import (
 	"fmt"
-	"net/http"
-	"time"
-
-	"github.com/reggiepy/LogBeetle/pkg/consumer"
-	"github.com/reggiepy/LogBeetle/pkg/producer"
-	"github.com/reggiepy/LogBeetle/pkg/util/array_utils"
-
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
+
+type ApiMessage struct{}
 
 // @Summary 发送消息
 // @Description 发送消息到nsq
@@ -23,7 +19,7 @@ import (
 //
 // @Success      200  {object}   model.JSONResult
 // @router      /log-beetle/v1/send-message   [post]
-func SendMessageHandler(c *gin.Context) {
+func (a *ApiMessage) SendMessageHandler(c *gin.Context) {
 	// 从请求体中获取消息内容
 	message := c.DefaultPostForm("message", "")
 	if message == "" {
@@ -40,25 +36,14 @@ func SendMessageHandler(c *gin.Context) {
 		})
 		return
 	}
-	if !array_utils.InArray(projectName, consumer.Topics) {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "project_name is not allowed",
-		})
-		return
-	}
-	start := time.Now()
-	// 向 NSQ 发送消息
-	err := producer.Instance.Publish(projectName, []byte(message))
+
+	err := serverPublic.Message.SendMessage(projectName, message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Failed to send message",
+			"message": fmt.Sprintf("%v", err),
 		})
 		return
 	}
-	end := time.Now()
-	elapsed := end.Sub(start)
-	fmt.Printf("topic【%s】消息写入时间：%s\n", projectName, elapsed)
-
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Message send successfully",
 	})

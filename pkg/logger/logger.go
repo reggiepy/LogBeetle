@@ -108,7 +108,15 @@ func InitLogger(logConfig Config, options ...ConfigOption) error {
 		"warn":  zapcore.WarnLevel,
 		"error": zapcore.ErrorLevel,
 	}
-	writeSyncer := getLogWriter(logConfig.LogFile, logConfig.MaxSize, logConfig.MaxBackups, logConfig.MaxAge, logConfig.Compress)
+
+	lumberJackLogger := &lumberjack.Logger{
+		Filename:   logConfig.LogFile,
+		MaxSize:    logConfig.MaxSize,
+		MaxBackups: logConfig.MaxBackups,
+		MaxAge:     logConfig.MaxAge,
+		Compress:   logConfig.Compress,
+	}
+	writeSyncer := zapcore.AddSync(lumberJackLogger)
 
 	logFormats := []string{"json", "logfmt"}
 	logFormat := "json"
@@ -149,15 +157,4 @@ func getEncoder(logFormat string) zapcore.Encoder {
 		return zapcore.NewJSONEncoder(encoderConfig) // 以json格式写入
 	}
 	return zapcore.NewConsoleEncoder(encoderConfig) // 以logfmt格式写入
-}
-
-func getLogWriter(filename string, maxSize, maxBackup, maxAge int, compress bool) zapcore.WriteSyncer {
-	lumberJackLogger := &lumberjack.Logger{
-		Filename:   filename,
-		MaxSize:    maxSize,
-		MaxBackups: maxBackup,
-		MaxAge:     maxAge,
-		Compress:   compress,
-	}
-	return zapcore.AddSync(lumberJackLogger)
 }

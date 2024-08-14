@@ -2,12 +2,12 @@ package consumer
 
 import (
 	"fmt"
+	"github.com/reggiepy/LogBeetle/global"
 	"io"
 	"path"
 
 	"github.com/nsqio/go-nsq"
-	"github.com/reggiepy/LogBeetle/pkg/config"
-	"github.com/reggiepy/LogBeetle/pkg/util/struct_utils"
+	"github.com/reggiepy/LogBeetle/util/struct_utils"
 	"go.uber.org/zap"
 )
 
@@ -137,7 +137,7 @@ func NewNSQLogConsumer(opts ...Options) (*NSQLogConsumer, error) {
 	}
 	c.NSQConsumer = consumer
 	// 创建 lumberjack.Logger 实例用于日志切割
-	consumerConfig := config.Instance.ConsumerConfig
+	consumerConfig := global.LbConfig.ConsumerConfig
 	filePath := path.Join(consumerConfig.LogPath, c.LogFileName)
 	c.LogFile = NewLJLoggerWriteCloser(filePath)
 

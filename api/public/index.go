@@ -1,9 +1,11 @@
-package api
+package public
 
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
+
+type ApiIndex struct{}
 
 // @Summary 首页
 // @Description 首页
@@ -12,7 +14,7 @@ import (
 // @Produce plain
 // @Success      200  {object}   model.AboutResponse
 // @router      /log-beetle/v1/   [get]
-func HomeHandler(c *gin.Context) {
+func (a *ApiIndex) HomeHandler(c *gin.Context) {
 	c.Header("Content-Type", "text/html; charset=utf-8")
 	c.String(http.StatusOK, "<h1>hello world.</h1>")
 }
@@ -24,7 +26,7 @@ func HomeHandler(c *gin.Context) {
 // @Produce plain
 // @Success      200  {string}   string
 // @router      /log-beetle/v1/ping   [get]
-func PingHandler(c *gin.Context) {
+func (a *ApiIndex) PingHandler(c *gin.Context) {
 	c.String(http.StatusOK, "pong")
 }
 
@@ -35,7 +37,7 @@ func PingHandler(c *gin.Context) {
 // @Produce json
 // @Success      200  {string}   model.AboutResponse
 // @router      /log-beetle/v1/about   [get]
-func AboutHandler(c *gin.Context) {
+func (a *ApiIndex) AboutHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"title": "About Us",
 	})
