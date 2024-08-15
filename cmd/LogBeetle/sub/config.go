@@ -61,7 +61,10 @@ var configGenerateCmd = &cobra.Command{
 		if file_utils.FileExists(configFile) {
 			return fmt.Errorf("config file already exists. please remove it before running this command")
 		}
-		defaultConfig := config.DefaultConfig()
+		v := boot.Viper()
+		v.SafeWriteConfig()
+		v.
+			defaultConfig := config.DefaultConfig()
 
 		err := config.SaveConfigToFile(defaultConfig, configFile)
 		if err != nil {
