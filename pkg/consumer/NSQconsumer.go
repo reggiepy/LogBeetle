@@ -141,6 +141,5 @@ func NewNSQLogConsumer(opts ...Options) (*NSQLogConsumer, error) {
 		return nil, err
 	}
 
-	c.RegisterTopic(c.NSQTopic)
 	return c, nil
 }
