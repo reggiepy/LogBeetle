@@ -2,9 +2,10 @@ package consumer
 
 import (
 	"fmt"
-	"github.com/reggiepy/LogBeetle/global"
 	"io"
 	"path"
+
+	"github.com/reggiepy/LogBeetle/global"
 
 	"github.com/nsqio/go-nsq"
 	"github.com/reggiepy/LogBeetle/goutils/structUtils"

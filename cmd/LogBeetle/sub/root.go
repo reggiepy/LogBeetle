@@ -3,14 +3,15 @@ package sub
 import (
 	"context"
 	"fmt"
-	"github.com/reggiepy/LogBeetle/boot"
-	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/goutils/enumUtils"
-	"github.com/reggiepy/LogBeetle/version"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/reggiepy/LogBeetle/boot"
+	"github.com/reggiepy/LogBeetle/global"
+	"github.com/reggiepy/LogBeetle/goutils/enumUtils"
+	"github.com/reggiepy/LogBeetle/version"
 
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
 	"github.com/reggiepy/LogBeetle/pkg/producer"

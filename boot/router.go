@@ -37,7 +37,7 @@ func Router() *gin.Engine {
 	} else {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	//r := gin.Default()
+	// r := gin.Default()
 	r := gin.New()
 
 	// 注册全局中间件
@@ -46,11 +46,11 @@ func Router() *gin.Engine {
 	r.Use(middleware.Cors())
 
 	group := r.Group("log-beetle")
-	//Public route: starts with "public". There is no need to regroup or authenticate within the route
+	// Public route: starts with "public". There is no need to regroup or authenticate within the route
 	PublicGroup := group.Group("v1")
 	RouterPublic(PublicGroup)
 
-	//Private route：starts with "". The route is grouped according to the actual performance, and authentication is required
+	// Private route：starts with "". The route is grouped according to the actual performance, and authentication is required
 	PrivateGroup := group.Group("")
 	// 注册全局中间件
 	RouterPrivate(PrivateGroup)

@@ -66,7 +66,7 @@ func (c *Config) NewLogger(opts ...Option) (*zap.Logger, error) {
 	// 1. zap.ReplaceGlobals 函数将当前初始化的 logger 替换到全局的 logger,
 	// 2. 使用 logger 的时候 直接通过 zap.S().Debugf("xxx") or zap.L().Debug("xxx")
 	// 3. 使用 zap.S() 和 zap.L() 提供全局锁，保证一个全局的安全访问logger的方式
-	//zap.ReplaceGlobals(logger) // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()调用即可
+	// zap.ReplaceGlobals(logger) // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()调用即可
 	// zap.L().Debug("")
 	// zap.S().Debugf("")
 	return logger, nil

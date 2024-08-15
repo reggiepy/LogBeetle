@@ -1,4 +1,3 @@
 package private
 
-type ServicePrivate struct {
-}
+type ServicePrivate struct{}

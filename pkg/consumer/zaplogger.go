@@ -1,13 +1,14 @@
 package consumer
 
 import (
+	"io"
+	"time"
+
 	"github.com/natefinch/lumberjack"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"io"
-	"time"
 )
 
 // NewZAPLogger 创建一个新的 zap.Logger 实例，使用指定的写入器。

@@ -3,9 +3,10 @@ package boot
 import (
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/reggiepy/LogBeetle/global"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 func Boot() {

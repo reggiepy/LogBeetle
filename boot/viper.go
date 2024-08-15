@@ -3,6 +3,7 @@ package boot
 import (
 	"errors"
 	"fmt"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/spf13/viper"

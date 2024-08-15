@@ -3,10 +3,11 @@ package boot
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/goutils/logUtils"
 	"go.uber.org/zap"
-	"os"
 )
 
 func Log() *zap.Logger {

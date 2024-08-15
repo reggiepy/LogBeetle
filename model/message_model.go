@@ -1,4 +1,3 @@
 package model
 
-type MessageResponse struct {
-}
+type MessageResponse struct{}

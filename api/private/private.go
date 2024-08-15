@@ -1,4 +1,3 @@
 package private
 
-type ApiPrivate struct {
-}
+type ApiPrivate struct{}
