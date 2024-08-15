@@ -7,7 +7,6 @@ import (
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/goutils/arrayUtils"
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
-	"github.com/reggiepy/LogBeetle/pkg/producer"
 )
 
 type Message struct{}
@@ -18,7 +17,7 @@ func (m *Message) SendMessage(projectName string, message string) error {
 	}
 	start := time.Now()
 	// 向 NSQ 发送消息
-	err := producer.Instance.Publish(projectName, []byte(message))
+	err := global.LbNsqProducer.Publish(projectName, []byte(message))
 	if err != nil {
 		return fmt.Errorf("topic【%s】send message faild: %v\n", projectName, err)
 	}

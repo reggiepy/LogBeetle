@@ -14,8 +14,6 @@ import (
 	"github.com/reggiepy/LogBeetle/version"
 
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
-	"github.com/reggiepy/LogBeetle/pkg/producer"
-
 	"github.com/reggiepy/LogBeetle/pkg/worker"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -60,6 +58,7 @@ var rootCmd = cobra.Command{
 		}
 		global.LbViper = boot.Viper()
 		global.LbLogger = boot.Log()
+		global.LbNsqProducer = boot.NsqProducer()
 		boot.Boot()
 		StartServer()
 		return nil
@@ -87,7 +86,6 @@ func StartServer() {
 	}
 
 	consumerManager := consumer.NewLogBeetleConsumerManager()
-	producerManager := producer.NewLogBeetleProducerManager()
 
 	// 定义工作线程
 	workers := []*worker.Worker{
@@ -97,22 +95,11 @@ func StartServer() {
 			worker.WithCtx(ctx),
 			worker.WithWg(&wg),
 			worker.WithStop(func() {
-				producerManager.Stop()
+				global.LbNsqProducer.Stop()
+				global.LbLogger.Info(fmt.Sprintf("nsq product close."))
 				consumerManager.Stop()
 			}),
 			worker.WithStart(func() {
-				// 初始化 NSQ 生产者
-				p, err := producer.NewNSQProducer(
-					producer.WithNSQAddress(nsqConfig.NSQDAddress),
-					producer.WithNSQAuthSecret(nsqConfig.AuthSecret),
-				)
-				if err != nil {
-					fmt.Printf("error creating producer: %v\n", err)
-				} else {
-					producerManager.Add(p)
-					producer.InitInstance(p)
-				}
-
 				c, err := consumer.NewNSQLogConsumer(
 					consumer.WithName("test"),
 					consumer.WithLogFileName("test.log"),
@@ -147,6 +134,8 @@ func StartServer() {
 			}),
 		),
 	}
+
+	defer global.LbLogger.Sync() // 确保在程序退出时刷新日志缓冲区
 
 	// 启动工作线程
 	for _, w := range workers {

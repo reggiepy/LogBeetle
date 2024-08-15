@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/reggiepy/LogBeetle/global"
-	"go.uber.org/zap"
 )
 
 func Boot() {
@@ -25,5 +24,5 @@ func Boot() {
 
 func logo(addr string) {
 	fmt.Println("System started, listening: " + addr)
-	zap.L().Info("System started, listening: " + addr)
+	global.LbLogger.Info("System started, listening: " + addr)
 }

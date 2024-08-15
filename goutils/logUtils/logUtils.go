@@ -40,17 +40,17 @@ func (c *Config) NewLogger(opts ...Option) (*zap.Logger, error) {
 		opt.apply(c)
 	}
 
-	lumberJackLogger := &lumberjack.Logger{
+	lj := &lumberjack.Logger{
 		Filename:   c.LogFile,
 		MaxSize:    c.MaxSize,
 		MaxBackups: c.MaxBackups,
 		MaxAge:     c.MaxAge,
 		Compress:   c.Compress,
 	}
-	writeSyncer := zapcore.AddSync(lumberJackLogger)
+	writeSyncer := zapcore.AddSync(lj)
 
 	logFormat := "json"
-	for logFormats.Has(c.LogFormat) {
+	if logFormats.Has(c.LogFormat) {
 		logFormat = c.LogFormat
 	}
 	encoder := NewEncoder(logFormat)
@@ -73,11 +73,27 @@ func (c *Config) NewLogger(opts ...Option) (*zap.Logger, error) {
 }
 
 func NewEncoder(logFormat string) zapcore.Encoder {
+	// 创建一个自定义的 EncoderConfig 实例
 	encoderConfig := zap.NewProductionEncoderConfig()
+
+	// 设置时间编码格式为 ISO 8601
+	// 这将以标准的 ISO 8601 格式输出时间，例如 "2024-08-15T10:00:00Z"
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	encoderConfig.TimeKey = "time"
+
+	// 设置日志级别编码格式为大写
+	// 这将把日志级别输出为大写字母，例如 INFO、ERROR
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+
+	// 设置时间字段的键名为 "time"
+	// 在日志输出中，时间字段将使用 "time" 作为键名
+	encoderConfig.TimeKey = "time"
+
+	// 设置持续时间的编码格式为秒
+	// 这将把持续时间格式化为秒数
 	encoderConfig.EncodeDuration = zapcore.SecondsDurationEncoder
+
+	// 设置调用者信息的编码格式为简短格式
+	// 这将以相对路径和行号输出调用者信息，例如 "main.go:42"
 	encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 	if logFormat == "json" {
 		return zapcore.NewJSONEncoder(encoderConfig) // 以json格式写入

@@ -39,8 +39,6 @@ func Viper() *viper.Viper {
 func BindConfig(v *viper.Viper) {
 	if err := v.Unmarshal(&global.LbConfig); err != nil {
 		panic(fmt.Errorf("Failed to bind config file：%s \n", err))
-	} else {
-		fmt.Println("Bind config file succeeded！")
 	}
 }
 

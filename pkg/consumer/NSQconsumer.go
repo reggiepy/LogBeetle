@@ -5,6 +5,8 @@ import (
 	"io"
 	"path"
 
+	"gopkg.in/natefinch/lumberjack.v2"
+
 	"github.com/reggiepy/LogBeetle/global"
 
 	"github.com/nsqio/go-nsq"
@@ -31,19 +33,20 @@ type NSQLogConsumer struct {
 func (c *NSQLogConsumer) Close() error {
 	var err error
 	if c.LogFile != nil {
-		fmt.Printf("关闭 【%s】 Consumer LogFile\n", c.Name)
 		err = c.Logger.Sync()
 		if err != nil {
-			return fmt.Errorf("Sync 【%s】  Logger 失败: %v", c.Name, err)
+			return fmt.Errorf("sync 【%s】  Logger faild: %v", c.Name, err)
 		}
+		global.LbLogger.Info(fmt.Sprintf("sync consumer 【%s】 logger", c.Name))
 		err = c.LogFile.Close()
 		if err != nil {
-			return fmt.Errorf("关闭 【%s】 日志文件失败: %v", c.Name, err)
+			return fmt.Errorf("closing 【%s】 logfile faild: %v", c.Name, err)
 		}
+		global.LbLogger.Info(fmt.Sprintf("closing consumer 【%s】 logger file", c.Name))
 	}
 	if c.NSQConsumer != nil {
-		fmt.Printf("关闭 【%s】 Consumer NSQConsumer\n", c.Name)
 		c.NSQConsumer.Stop()
+		global.LbLogger.Info(fmt.Sprintf("closing consumer 【%s】 nsq", c.Name))
 	}
 	return nil
 }
@@ -140,12 +143,18 @@ func NewNSQLogConsumer(opts ...Options) (*NSQLogConsumer, error) {
 	// 创建 lumberjack.Logger 实例用于日志切割
 	consumerConfig := global.LbConfig.ConsumerConfig
 	filePath := path.Join(consumerConfig.LogPath, c.LogFileName)
-	c.LogFile = NewLJLoggerWriteCloser(filePath)
-
-	// logger := NewZEROLogger(c.LogFile)
+	lj := &lumberjack.Logger{
+		Filename:   filePath, // 日志文件名
+		MaxSize:    1,        // 日志文件大小限制，单位为 MB
+		MaxBackups: 5,        // 最大保留的旧日志文件数量
+		MaxAge:     30,       // 旧日志文件保留天数
+		Compress:   false,    // 是否压缩旧日志文件
+	}
+	c.LogFile = lj
 
 	// 创建Logger
-	c.Logger = NewZAPLogger(c.LogFile)
+	logger := NewZAPLogger(lj)
+	c.Logger = logger
 	c.NSQConsumer.AddHandler(&MessageHandler{
 		Handler: func(message []byte) error {
 			c.Logger.Info(string(message))
