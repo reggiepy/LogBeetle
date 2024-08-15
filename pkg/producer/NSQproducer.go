@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/nsqio/go-nsq"
-	"github.com/reggiepy/LogBeetle/util/struct_utils"
+	"github.com/reggiepy/LogBeetle/goutils/structUtils"
 )
 
 var (
@@ -62,7 +62,7 @@ func NewNSQProducer(opts ...Options) (*NSQProducer, error) {
 			panic(err.(any))
 		}
 	}
-	status, err := struct_utils.IsEmptyStringField(p, "NSQAddress")
+	status, err := structUtils.IsEmptyStringField(p, "NSQAddress")
 	if err != nil {
 		return nil, err
 	}

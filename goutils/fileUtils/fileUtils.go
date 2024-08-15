@@ -1,4 +1,4 @@
-package file_utils
+package fileUtils
 
 import "os"
 

@@ -7,7 +7,7 @@ import (
 	"path"
 
 	"github.com/nsqio/go-nsq"
-	"github.com/reggiepy/LogBeetle/util/struct_utils"
+	"github.com/reggiepy/LogBeetle/goutils/structUtils"
 	"go.uber.org/zap"
 )
 
@@ -117,7 +117,7 @@ func NewNSQLogConsumer(opts ...Options) (*NSQLogConsumer, error) {
 			panic(err.(any))
 		}
 	}
-	status, err := struct_utils.IsEmptyStringField(c, "NSQTopic", "NSQAddress", "LogFileName", "Name")
+	status, err := structUtils.IsEmptyStringField(c, "NSQTopic", "NSQAddress", "LogFileName", "Name")
 	if err != nil {
 		return nil, err
 	}

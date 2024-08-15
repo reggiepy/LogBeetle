@@ -2,18 +2,17 @@ package sub
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/reggiepy/LogBeetle/boot"
 	"github.com/reggiepy/LogBeetle/config"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/util/file_utils"
-	"github.com/reggiepy/LogBeetle/util/json_utils"
+	"github.com/reggiepy/LogBeetle/goutils/fileUtils"
+	"github.com/reggiepy/LogBeetle/goutils/jsonUtils"
 	"github.com/spf13/viper"
-	"os"
 
 	"github.com/spf13/cobra"
 )
-
-var ()
 
 func init() {
 	rootCmd.AddCommand(configCmd)
@@ -43,7 +42,7 @@ var configShowCmd = &cobra.Command{
 	Short: "show config",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		global.LbViper = boot.Viper()
-		data, err := json_utils.AnyToJson(global.LbConfig, configFormat.String())
+		data, err := jsonUtils.AnyToJson(global.LbConfig, configFormat.String())
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
@@ -58,7 +57,7 @@ var configGenerateCmd = &cobra.Command{
 	Short: "generate default config",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		configFile := viper.GetString("config")
-		if file_utils.FileExists(configFile) {
+		if fileUtils.FileExists(configFile) {
 			return fmt.Errorf("config file already exists. please remove it before running this command")
 		}
 		defaultConfig := config.DefaultConfig()

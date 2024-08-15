@@ -1,4 +1,4 @@
-package array_utils
+package arrayUtils
 
 import (
 	"fmt"

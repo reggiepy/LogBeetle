@@ -1,4 +1,4 @@
-package logger
+package logUtils
 
 import (
 	"reflect"

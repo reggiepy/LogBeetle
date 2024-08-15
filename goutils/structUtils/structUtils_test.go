@@ -1,4 +1,4 @@
-package struct_utils
+package structUtils
 
 import (
 	"testing"

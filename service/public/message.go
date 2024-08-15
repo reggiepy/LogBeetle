@@ -2,9 +2,9 @@ package public
 
 import (
 	"fmt"
+	"github.com/reggiepy/LogBeetle/goutils/arrayUtils"
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
 	"github.com/reggiepy/LogBeetle/pkg/producer"
-	"github.com/reggiepy/LogBeetle/util/array_utils"
 	"go.uber.org/zap"
 	"time"
 )
@@ -12,7 +12,7 @@ import (
 type Message struct{}
 
 func (m *Message) SendMessage(projectName string, message string) error {
-	if !array_utils.InArray(projectName, consumer.Topics) {
+	if !arrayUtils.InArray(projectName, consumer.Topics) {
 		return fmt.Errorf("topic【%s】 is not allowed\n", projectName)
 	}
 	start := time.Now()
