@@ -65,7 +65,7 @@ const docTemplate = `{
             "post": {
                 "description": "发送消息到 NSQ",
                 "consumes": [
-                    "application/x-www-form-urlencoded"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -76,31 +76,13 @@ const docTemplate = `{
                 "summary": "列出 NSQ 注册的 topic",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "page",
-                        "name": "page",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "pageSize",
-                        "name": "pageSize",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sortBy",
-                        "name": "sortBy",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "default": false,
-                        "description": "desc",
-                        "name": "desc",
-                        "in": "formData"
+                        "description": "请求参数",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.RequestGetNsqTopicList"
+                        }
                     }
                 ],
                 "responses": {
@@ -193,6 +175,23 @@ const docTemplate = `{
                 },
                 "data": {},
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.RequestGetNsqTopicList": {
+            "type": "object",
+            "properties": {
+                "desc": {
+                    "type": "boolean"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "sort_by": {
                     "type": "string"
                 }
             }

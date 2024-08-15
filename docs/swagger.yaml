@@ -12,6 +12,17 @@ definitions:
       message:
         type: string
     type: object
+  model.RequestGetNsqTopicList:
+    properties:
+      desc:
+        type: boolean
+      page:
+        type: integer
+      page_size:
+        type: integer
+      sort_by:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -48,28 +59,15 @@ paths:
   /log-beetle/v1/nsq/register-topic:
     post:
       consumes:
-      - application/x-www-form-urlencoded
+      - application/json
       description: 发送消息到 NSQ
       parameters:
-      - default: 1
-        description: page
-        in: formData
-        name: page
-        type: integer
-      - default: 10
-        description: pageSize
-        in: formData
-        name: pageSize
-        type: integer
-      - description: sortBy
-        in: formData
-        name: sortBy
-        type: string
-      - default: false
-        description: desc
-        in: formData
-        name: desc
-        type: boolean
+      - description: 请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.RequestGetNsqTopicList'
       produces:
       - application/json
       responses:

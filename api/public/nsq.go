@@ -11,13 +11,10 @@ type ApiNsq struct {
 // @Summary 列出 NSQ 注册的 topic
 // @Description 发送消息到 NSQ
 // @Tags NSQ
-// @Accept x-www-form-urlencoded
+// @Accept json
 // @Produce json
 //
-// @Param page formData int false "page" default(1)
-// @Param pageSize formData int false "pageSize" default(10)
-// @Param sortBy formData string false "sortBy"
-// @Param desc formData bool false "desc" default(false)
+// @Param request body model.RequestGetNsqTopicList true "请求参数"
 //
 // @Success      200  {object}   model.JSONResult
 // @Router /log-beetle/v1/nsq/register-topic [post]
