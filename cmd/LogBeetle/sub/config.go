@@ -16,16 +16,13 @@ import (
 
 func init() {
 	rootCmd.AddCommand(configCmd)
+
+	// show config
 	configCmd.AddCommand(configShowCmd)
 	configShowCmd.Flags().Var(configFormat, "format", "humanReadable | simple")
-	configCmd.ValidArgsFunction = func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json", "simple"}, cobra.ShellCompDirectiveNoFileComp
-	}
 
+	// generate config
 	configCmd.AddCommand(configGenerateCmd)
-	configCmd.ValidArgsFunction = func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json", "simple"}, cobra.ShellCompDirectiveNoFileComp
-	}
 }
 
 var configCmd = &cobra.Command{
@@ -40,6 +37,9 @@ var configCmd = &cobra.Command{
 var configShowCmd = &cobra.Command{
 	Use:   "show",
 	Short: "show config",
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"json", "simple"}, cobra.ShellCompDirectiveNoFileComp
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		global.LbViper = boot.Viper()
 		data, err := jsonUtils.AnyToJson(global.LbConfig, configFormat.String())

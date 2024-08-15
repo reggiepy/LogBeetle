@@ -12,18 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package version
+package versionUtils
 
 import (
 	"strconv"
 	"strings"
 )
-
-var version string = "1.0.0"
-
-func Full() string {
-	return version
-}
 
 func getSubVersion(v string, position int) int64 {
 	arr := strings.Split(v, ".")
@@ -44,14 +38,6 @@ func Major(v string) int64 {
 
 func Minor(v string) int64 {
 	return getSubVersion(v, 2)
-}
-
-// add every case there if server will not accept client's protocol and return false
-func Compat(client string) (ok bool, msg string) {
-	if LessThan(client, "0.18.0") {
-		return false, "Please upgrade your frpc version to at least 0.18.0"
-	}
-	return true, ""
 }
 
 func LessThan(client string, server string) bool {

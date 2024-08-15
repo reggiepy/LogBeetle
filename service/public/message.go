@@ -2,10 +2,10 @@ package public
 
 import (
 	"fmt"
+	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/goutils/arrayUtils"
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
 	"github.com/reggiepy/LogBeetle/pkg/producer"
-	"go.uber.org/zap"
 	"time"
 )
 
@@ -23,6 +23,6 @@ func (m *Message) SendMessage(projectName string, message string) error {
 	}
 	end := time.Now()
 	elapsed := end.Sub(start)
-	zap.L().Info(fmt.Sprintf("topic【%s】消息写入时间：%s\n", projectName, elapsed))
+	global.LbLogger.Info(fmt.Sprintf("topic【%s】消息写入时间：%s\n", projectName, elapsed))
 	return nil
 }

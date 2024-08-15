@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/boot"
 	"github.com/reggiepy/LogBeetle/global"
-	"go.uber.org/zap"
+	"github.com/reggiepy/LogBeetle/goutils/enumUtils"
+	"github.com/reggiepy/LogBeetle/version"
 	"os"
 	"os/signal"
 	"sync"
@@ -21,7 +22,7 @@ import (
 
 var (
 	showVersion  bool
-	configFormat = NewEnum([]string{"humanReadable", "simple"}, "humanReadable")
+	configFormat = enumUtils.NewEnum([]string{"humanReadable", "simple"}, "humanReadable")
 )
 
 func init() {
@@ -45,18 +46,22 @@ func init() {
 }
 
 var rootCmd = cobra.Command{
-	Use:     "LogBeetle",
-	Short:   "LogBeetle help",
-	Long:    `LogBeetle help`,
-	Version: "",
+	Use:   "LogBeetle",
+	Short: "LogBeetle help",
+	Long:  `LogBeetle help`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		return nil
 	},
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if showVersion {
+			fmt.Println(version.Full())
+			return nil
+		}
 		global.LbViper = boot.Viper()
-		boot.Log()
+		global.LbLogger = boot.Log()
 		boot.Boot()
 		StartServer()
+		return nil
 	},
 }
 
@@ -119,7 +124,7 @@ func StartServer() {
 				} else {
 					consumerManager.Add(c)
 					fmt.Printf("consumer %s added\n", "test")
-					zap.L().Info(fmt.Sprintf("consumer %s added\n", "test"))
+					global.LbLogger.Info(fmt.Sprintf("consumer %s added\n", "test"))
 				}
 
 				// 添加其他消费者

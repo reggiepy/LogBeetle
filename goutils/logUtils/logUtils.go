@@ -1,14 +1,11 @@
 package logUtils
 
 import (
-	"reflect"
-
 	"github.com/natefinch/lumberjack"
+	"github.com/reggiepy/LogBeetle/goutils/arrayUtils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
-
-var Logger *zap.Logger
 
 type Config struct {
 	LogFile    string `json:"LogFile" yaml:"LogFile"`       // 日志文件名
@@ -18,64 +15,6 @@ type Config struct {
 	Compress   bool   `json:"Compress" yaml:"Compress"`     // 是否压缩旧日志文件
 	LogLevel   string `json:"LogLevel" yaml:"LogLevel"`     // 日志等级
 	LogFormat  string `json:"LogFormat" yaml:"LogFormat"`   // 日志等级
-}
-
-type ConfigOption func(loggerConfig *Config) error
-
-// WithLogFile 设置日志文件名
-func WithLogFile(logFile string) ConfigOption {
-	return func(loggerConfig *Config) error {
-		loggerConfig.LogFile = logFile
-		return nil
-	}
-}
-
-// WithMaxSize 设置日志文件大小限制，单位为 MB
-func WithMaxSize(maxSize int) ConfigOption {
-	return func(loggerConfig *Config) error {
-		loggerConfig.MaxSize = maxSize
-		return nil
-	}
-}
-
-// WithMaxBackups 设置最大保留的旧日志文件数量
-func WithMaxBackups(maxBackups int) ConfigOption {
-	return func(loggerConfig *Config) error {
-		loggerConfig.MaxBackups = maxBackups
-		return nil
-	}
-}
-
-// WithMaxAge 设置旧日志文件保留天数
-func WithMaxAge(maxAge int) ConfigOption {
-	return func(loggerConfig *Config) error {
-		loggerConfig.MaxAge = maxAge
-		return nil
-	}
-}
-
-// WithCompress 设置是否压缩旧日志文件
-func WithCompress(compress bool) ConfigOption {
-	return func(loggerConfig *Config) error {
-		loggerConfig.Compress = compress
-		return nil
-	}
-}
-
-// WithLogLevel 设置日志等级
-func WithLogLevel(logLevel string) ConfigOption {
-	return func(loggerConfig *Config) error {
-		loggerConfig.LogLevel = logLevel
-		return nil
-	}
-}
-
-// WithLogFormat 设置日志格式
-func WithLogFormat(logFormat string) ConfigOption {
-	return func(loggerConfig *Config) error {
-		loggerConfig.LogFormat = logFormat
-		return nil
-	}
 }
 
 // NewDefaultConfig 创建默认配置
@@ -91,62 +30,49 @@ func NewDefaultConfig() *Config {
 	}
 }
 
-// InitLogger 初始化Logger
-func InitLogger(logConfig Config, options ...ConfigOption) error {
-	if reflect.DeepEqual(logConfig, Config{}) {
-		logConfig = *NewDefaultConfig()
-	}
-	for _, option := range options {
-		err := option(&logConfig)
-		if err != nil {
-			return err
-		}
-	}
-	logLevel := map[string]zapcore.Level{
-		"debug": zapcore.DebugLevel,
-		"info":  zapcore.InfoLevel,
-		"warn":  zapcore.WarnLevel,
-		"error": zapcore.ErrorLevel,
+// NewLogger 初始化Logger
+func (c *Config) NewLogger(opts ...Option) (*zap.Logger, error) {
+	var (
+		logger     *zap.Logger
+		logFormats = arrayUtils.NewSet("json", "logfmt")
+	)
+	for _, opt := range opts {
+		opt.apply(c)
 	}
 
 	lumberJackLogger := &lumberjack.Logger{
-		Filename:   logConfig.LogFile,
-		MaxSize:    logConfig.MaxSize,
-		MaxBackups: logConfig.MaxBackups,
-		MaxAge:     logConfig.MaxAge,
-		Compress:   logConfig.Compress,
+		Filename:   c.LogFile,
+		MaxSize:    c.MaxSize,
+		MaxBackups: c.MaxBackups,
+		MaxAge:     c.MaxAge,
+		Compress:   c.Compress,
 	}
 	writeSyncer := zapcore.AddSync(lumberJackLogger)
 
-	logFormats := []string{"json", "logfmt"}
 	logFormat := "json"
-	for _, format := range logFormats {
-		if format == logConfig.LogFormat {
-			logFormat = format
-		}
+	for logFormats.Has(c.LogFormat) {
+		logFormat = c.LogFormat
 	}
-	encoder := getEncoder(logFormat)
-	l, ok := logLevel[logConfig.LogLevel] // 日志打印级别
-	if !ok {
-		l = logLevel["info"]
+	encoder := NewEncoder(logFormat)
+
+	// 日志打印级别
+	l, err := zapcore.ParseLevel(c.LogLevel)
+	if err != nil {
+		l = zapcore.InfoLevel
 	}
-	//l, err := zapcore.ParseLevel(logConfig.LogLevel)
-	//if err != nil {
-	//	l = zapcore.InfoLevel
-	//}
 	core := zapcore.NewCore(encoder, writeSyncer, l)
 
-	Logger = zap.New(core, zap.AddCaller()) // zap.Addcaller() 输出日志打印文件和行数如： logger/logger_test.go:33
+	logger = zap.New(core, zap.AddCaller()) // zap.Addcaller() 输出日志打印文件和行数如： logger/logger_test.go:33
 	// 1. zap.ReplaceGlobals 函数将当前初始化的 logger 替换到全局的 logger,
 	// 2. 使用 logger 的时候 直接通过 zap.S().Debugf("xxx") or zap.L().Debug("xxx")
 	// 3. 使用 zap.S() 和 zap.L() 提供全局锁，保证一个全局的安全访问logger的方式
-	zap.ReplaceGlobals(Logger) // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()调用即可
+	//zap.ReplaceGlobals(logger) // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()调用即可
 	// zap.L().Debug("")
 	// zap.S().Debugf("")
-	return nil
+	return logger, nil
 }
 
-func getEncoder(logFormat string) zapcore.Encoder {
+func NewEncoder(logFormat string) zapcore.Encoder {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoderConfig.TimeKey = "time"

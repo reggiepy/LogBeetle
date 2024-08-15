@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package version
+package versionUtils
 
 import (
 	"fmt"
@@ -25,7 +25,7 @@ import (
 
 func TestFull(t *testing.T) {
 	assert := assert.New(t)
-	version := Full()
+	version := "1.17.0"
 	arr := strings.Split(version, ".")
 	assert.Equal(3, len(arr))
 
@@ -44,22 +44,21 @@ func TestFull(t *testing.T) {
 
 func TestVersion(t *testing.T) {
 	assert := assert.New(t)
-	proto := Proto(Full())
-	major := Major(Full())
-	minor := Minor(Full())
+	version := "1.17.0"
+	proto := Proto(version)
+	major := Major(version)
+	minor := Minor(version)
 	parseVerion := fmt.Sprintf("%d.%d.%d", proto, major, minor)
-	version := Full()
 	assert.Equal(parseVerion, version)
 }
 
 func TestCompact(t *testing.T) {
 	assert := assert.New(t)
-	ok, _ := Compat("0.9.0")
+	version := "1.15.0"
+	version2 := "1.18.0"
+	ok := LessThan(version2, version)
 	assert.False(ok)
 
-	ok, _ = Compat("10.0.0")
+	ok = LessThan(version, version2)
 	assert.True(ok)
-
-	ok, _ = Compat("0.10.0")
-	assert.False(ok)
 }
