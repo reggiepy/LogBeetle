@@ -2,11 +2,12 @@ package public
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/goutils/arrayUtils"
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
 	"github.com/reggiepy/LogBeetle/pkg/producer"
-	"time"
 )
 
 type Message struct{}
