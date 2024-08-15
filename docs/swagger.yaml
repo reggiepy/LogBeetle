@@ -45,6 +45,41 @@ paths:
       summary: 关于
       tags:
       - 管理
+  /log-beetle/v1/nsq/register-topic:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 发送消息到 NSQ
+      parameters:
+      - default: 1
+        description: page
+        in: formData
+        name: page
+        type: integer
+      - default: 10
+        description: pageSize
+        in: formData
+        name: pageSize
+        type: integer
+      - description: sortBy
+        in: formData
+        name: sortBy
+        type: string
+      - default: false
+        description: desc
+        in: formData
+        name: desc
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.JSONResult'
+      summary: 列出 NSQ 注册的 topic
+      tags:
+      - NSQ
   /log-beetle/v1/ping:
     get:
       consumes:

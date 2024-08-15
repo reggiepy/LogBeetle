@@ -66,6 +66,7 @@ func RouterPublic(PublicGroup *gin.RouterGroup) {
 	{
 		routerPublic.RouterMessage.InitRouterMessage(PublicGroup)
 		routerPublic.RouterIndex.InitIndexRouter(PublicGroup)
+		routerPublic.RouterNsq.InitRouterNsq(PublicGroup)
 	}
 }
 

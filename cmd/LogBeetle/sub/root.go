@@ -3,12 +3,13 @@ package sub
 import (
 	"context"
 	"fmt"
+	"github.com/reggiepy/LogBeetle/boot"
+	"github.com/reggiepy/LogBeetle/pkg/consumer/manager"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
-	"github.com/reggiepy/LogBeetle/boot"
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/goutils/enumUtils"
 	"github.com/reggiepy/LogBeetle/version"
@@ -56,10 +57,6 @@ var rootCmd = cobra.Command{
 			fmt.Println(version.Full())
 			return nil
 		}
-		global.LbViper = boot.Viper()
-		global.LbLogger = boot.Log()
-		global.LbNsqProducer = boot.NsqProducer()
-		boot.Boot()
 		StartServer()
 		return nil
 	},
@@ -72,6 +69,10 @@ func Execute() {
 }
 
 func StartServer() {
+	global.LbViper = boot.Viper()
+	global.LbLogger = boot.Log()
+	global.LbNsqProducer = boot.NsqProducer()
+	boot.Boot()
 	// 创建一个上下文，以便能够在主程序退出时取消所有 Goroutine
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -85,7 +86,7 @@ func StartServer() {
 		_ = fmt.Errorf("consumer config is empty")
 	}
 
-	consumerManager := consumer.NewLogBeetleConsumerManager()
+	consumerManager := &manager.Manager{}
 
 	// 定义工作线程
 	workers := []*worker.Worker{
@@ -108,11 +109,10 @@ func StartServer() {
 					consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
 				)
 				if err != nil {
-					fmt.Printf("error creating consumer %s: %v\n", "test", err)
+					global.LbLogger.Fatal(fmt.Sprintf("error creating consumer %s: %v", "test", err))
 				} else {
 					consumerManager.Add(c)
-					fmt.Printf("consumer %s added\n", "test")
-					global.LbLogger.Info(fmt.Sprintf("consumer %s added\n", "test"))
+					global.LbLogger.Info(fmt.Sprintf("consumer %s add to consumer manager", "test"))
 				}
 
 				// 添加其他消费者
@@ -125,10 +125,10 @@ func StartServer() {
 						consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
 					)
 					if err != nil {
-						fmt.Printf("error creating consumer %s: %v\n", consumerConfig.Topic, err)
+						global.LbLogger.Fatal(fmt.Sprintf("error creating consumer %s: %v", consumerConfig.Topic, err))
 					} else {
 						consumerManager.Add(c)
-						fmt.Printf("consumer %s added\n", consumerConfig.Name)
+						global.LbLogger.Info(fmt.Sprintf("consumer %s add to consumer manager", consumerConfig.Name))
 					}
 				}
 			}),

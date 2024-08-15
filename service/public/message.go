@@ -6,13 +6,12 @@ import (
 
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/goutils/arrayUtils"
-	"github.com/reggiepy/LogBeetle/pkg/consumer"
 )
 
-type Message struct{}
+type ServiceMessage struct{}
 
-func (m *Message) SendMessage(projectName string, message string) error {
-	if !arrayUtils.InArray(projectName, consumer.Topics) {
+func (m *ServiceMessage) SendMessage(projectName string, message string) error {
+	if !arrayUtils.InArray(projectName, global.LbRegisterTopic) {
 		return fmt.Errorf("topic【%s】 is not allowed\n", projectName)
 	}
 	start := time.Now()

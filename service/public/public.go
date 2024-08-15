@@ -1,5 +1,6 @@
 package public
 
 type ServicePublic struct {
-	Message Message
+	ServiceMessage ServiceMessage
+	ServiceNsq ServiceNsq
 }

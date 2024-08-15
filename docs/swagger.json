@@ -50,6 +50,58 @@
                 }
             }
         },
+        "/log-beetle/v1/nsq/register-topic": {
+            "post": {
+                "description": "发送消息到 NSQ",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "NSQ"
+                ],
+                "summary": "列出 NSQ 注册的 topic",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "page",
+                        "name": "page",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "pageSize",
+                        "name": "pageSize",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sortBy",
+                        "name": "sortBy",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "desc",
+                        "name": "desc",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.JSONResult"
+                        }
+                    }
+                }
+            }
+        },
         "/log-beetle/v1/ping": {
             "get": {
                 "description": "ping",

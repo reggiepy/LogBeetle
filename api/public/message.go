@@ -15,8 +15,8 @@ type ApiMessage struct{}
 // @Accept x-www-form-urlencoded
 // @Produce json
 //
-//	@Param			message			formData		string		true	"message"
-//	@Param			project_name	formData		string		true	"project_name"
+// @Param			message			formData		string		true	"message"
+// @Param			project_name	formData		string		true	"project_name"
 //
 // @Success      200  {object}   model.JSONResult
 // @router      /log-beetle/v1/send-message   [post]
@@ -38,7 +38,7 @@ func (a *ApiMessage) SendMessageHandler(c *gin.Context) {
 		return
 	}
 
-	err := serverPublic.Message.SendMessage(projectName, message)
+	err := serverPublic.ServiceMessage.SendMessage(projectName, message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": fmt.Sprintf("%v", err),

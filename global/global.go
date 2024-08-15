@@ -8,8 +8,11 @@ import (
 )
 
 var (
-	LbConfig config.Config
-	LbViper  *viper.Viper
-	LbLogger *zap.Logger
+	LbConfig      config.Config
+	LbViper       *viper.Viper
+	LbLogger      *zap.Logger
 	LbNsqProducer *nsq.Producer
+
+	//	注册的topic
+	LbRegisterTopic []string
 )

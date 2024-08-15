@@ -14,8 +14,6 @@ import (
 	"go.uber.org/zap"
 )
 
-var Topics []string
-
 type NSQLogConsumer struct {
 	Name        string
 	LogFileName string
@@ -51,66 +49,65 @@ func (c *NSQLogConsumer) Close() error {
 	return nil
 }
 
+// initializeNSQConsumer initializes the NSQ consumer.
+func (c *NSQLogConsumer) initializeNSQConsumer() error {
+	if c.NSQTopic == "" || c.NSQAddress == "" || c.LogFileName == "" || c.Name == "" {
+		return fmt.Errorf("missing required fields")
+	}
+
+	cfg := nsq.NewConfig()
+	if c.NSQAuthSecret != "" {
+		if err := cfg.Set("auth_secret", c.NSQAuthSecret); err != nil {
+			return fmt.Errorf("failed to set auth_secret: %v", err)
+		}
+	}
+
+	consumer, err := nsq.NewConsumer(c.NSQTopic, "consumer", cfg)
+	if err != nil {
+		return fmt.Errorf("failed to create NSQ consumer: %v", err)
+	}
+	c.NSQConsumer = consumer
+
+	return nil
+}
+
+// initializeLogger initializes the logger and log file.
+func (c *NSQLogConsumer) initializeLogger() error {
+	consumerConfig := global.LbConfig.ConsumerConfig
+	filePath := path.Join(consumerConfig.LogPath, c.LogFileName)
+
+	lj := &lumberjack.Logger{
+		Filename:   filePath,
+		MaxSize:    1, // MB
+		MaxBackups: 5,
+		MaxAge:     30, // days
+		Compress:   false,
+	}
+	logger := NewZAPLogger(lj)
+	c.Logger = logger
+	c.LogFile = lj
+
+	c.NSQConsumer.AddHandler(&MessageHandler{
+		Handler: func(message []byte) error {
+			c.Logger.Info(string(message))
+			return nil
+		},
+	})
+
+	return nil
+}
+
+// connectToNSQ connects the consumer to the NSQ.
+func (c *NSQLogConsumer) connectToNSQ() error {
+	if err := c.NSQConsumer.ConnectToNSQD(c.NSQAddress); err != nil {
+		return fmt.Errorf("failed to connect to NSQ: %v", err)
+	}
+	c.RegisterTopic(c.NSQTopic)
+	return nil
+}
+
 func (c *NSQLogConsumer) RegisterTopic(topic ...string) {
-	Topics = append(Topics, topic...)
-}
-
-type Options func(n *NSQLogConsumer) error
-
-// WithAuthSecret 设置NSQ消费者的认证秘钥
-func WithNSQAuthSecret(authSecret string) Options {
-	return func(n *NSQLogConsumer) error {
-		n.NSQAuthSecret = authSecret
-		return nil
-	}
-}
-
-// WithName 设置NSQ消费者的名称
-func WithName(name string) Options {
-	return func(n *NSQLogConsumer) error {
-		n.Name = name
-		return nil
-	}
-}
-
-// WithLogFileName 设置NSQ消费者的日志文件名
-func WithLogFileName(logFileName string) Options {
-	return func(n *NSQLogConsumer) error {
-		n.LogFileName = logFileName
-		return nil
-	}
-}
-
-// WithLogFile 设置NSQ消费者的日志文件
-func WithLogFile(logFile io.WriteCloser) Options {
-	return func(n *NSQLogConsumer) error {
-		n.LogFile = logFile
-		return nil
-	}
-}
-
-// WithLogger 设置NSQ消费者的日志记录器
-func WithLogger(logger *zap.Logger) Options {
-	return func(n *NSQLogConsumer) error {
-		n.Logger = logger
-		return nil
-	}
-}
-
-// WithNSQTopic 设置NSQ消费者的主题
-func WithNSQTopic(topic string) Options {
-	return func(n *NSQLogConsumer) error {
-		n.NSQTopic = topic
-		return nil
-	}
-}
-
-// WithNSQAddress 设置NSQ消费者的地址
-func WithNSQAddress(address string) Options {
-	return func(n *NSQLogConsumer) error {
-		n.NSQAddress = address
-		return nil
-	}
+	global.LbRegisterTopic = append(global.LbRegisterTopic, topic...)
 }
 
 func NewNSQLogConsumer(opts ...Options) (*NSQLogConsumer, error) {
@@ -128,43 +125,22 @@ func NewNSQLogConsumer(opts ...Options) (*NSQLogConsumer, error) {
 	if status {
 		return nil, fmt.Errorf("%v", err)
 	}
-	cfg := nsq.NewConfig()
-	if c.NSQAuthSecret != "" {
-		if err := cfg.Set("auth_secret", c.NSQAuthSecret); err != nil {
-			return nil, fmt.Errorf("failed to set auth_secret: %v", err)
-		}
+
+	// Validate and initialize NSQ consumer
+	if err := c.initializeNSQConsumer(); err != nil {
+		return nil, err
 	}
 
-	consumer, err := nsq.NewConsumer(c.NSQTopic, "consumer", cfg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create NSQ Consumer: %v", err)
+	// Initialize logging
+	if err := c.initializeLogger(); err != nil {
+		return nil, err
 	}
-	c.NSQConsumer = consumer
-	// 创建 lumberjack.Logger 实例用于日志切割
-	consumerConfig := global.LbConfig.ConsumerConfig
-	filePath := path.Join(consumerConfig.LogPath, c.LogFileName)
-	lj := &lumberjack.Logger{
-		Filename:   filePath, // 日志文件名
-		MaxSize:    1,        // 日志文件大小限制，单位为 MB
-		MaxBackups: 5,        // 最大保留的旧日志文件数量
-		MaxAge:     30,       // 旧日志文件保留天数
-		Compress:   false,    // 是否压缩旧日志文件
-	}
-	c.LogFile = lj
 
-	// 创建Logger
-	logger := NewZAPLogger(lj)
-	c.Logger = logger
-	c.NSQConsumer.AddHandler(&MessageHandler{
-		Handler: func(message []byte) error {
-			c.Logger.Info(string(message))
-			return nil
-		},
-	})
-	err = c.NSQConsumer.ConnectToNSQD(c.NSQAddress)
-	if err != nil {
-		return nil, fmt.Errorf("连接NSQ失败:%v", err)
+	// Register topic and connect to NSQ
+	if err := c.connectToNSQ(); err != nil {
+		return nil, err
 	}
+
 	c.RegisterTopic(c.NSQTopic)
 	return c, nil
 }

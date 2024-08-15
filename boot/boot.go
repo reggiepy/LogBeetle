@@ -16,7 +16,7 @@ func Boot() {
 	}
 	go func() {
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			global.LbLogger.Fatal(fmt.Sprintf("start http server error: %v\n", err))
+			global.LbLogger.Fatal(fmt.Sprintf("start http server error: %v", err))
 		}
 	}()
 	logo(addr)

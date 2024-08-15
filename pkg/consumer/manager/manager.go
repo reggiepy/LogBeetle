@@ -1,4 +1,4 @@
-package consumer
+package manager
 
 import (
 	"fmt"
@@ -25,8 +25,4 @@ func (m *Manager) Add(c LogBeetleConsumer) {
 	m.mux.Lock()
 	defer m.mux.Unlock()
 	m.consumers = append(m.consumers, c)
-}
-
-func NewLogBeetleConsumerManager() *Manager {
-	return &Manager{}
 }
