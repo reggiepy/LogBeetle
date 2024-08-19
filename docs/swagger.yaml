@@ -23,6 +23,11 @@ definitions:
       sort_by:
         type: string
     type: object
+  model.SystemInfo:
+    properties:
+      goroutine_number:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
@@ -119,4 +124,26 @@ paths:
       summary: 发送消息
       tags:
       - 消息管理
+  /log-beetle/v1/system/system-info:
+    post:
+      consumes:
+      - application/json
+      description: 获取系统信息
+      parameters:
+      - description: 请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.SystemInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.JSONResult'
+      summary: 获取系统信息
+      tags:
+      - 系统
 swagger: "2.0"

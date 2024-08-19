@@ -8,6 +8,7 @@ import (
 type Manager struct {
 	consumers []LogBeetleConsumer
 	mux       sync.Mutex
+	cnt       int
 }
 
 func (m *Manager) Stop() {
@@ -25,4 +26,9 @@ func (m *Manager) Add(c LogBeetleConsumer) {
 	m.mux.Lock()
 	defer m.mux.Unlock()
 	m.consumers = append(m.consumers, c)
+	m.cnt += 1
+}
+
+func (m *Manager) Count() int {
+	return m.cnt
 }

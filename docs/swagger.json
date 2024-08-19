@@ -145,6 +145,40 @@
                     }
                 }
             }
+        },
+        "/log-beetle/v1/system/system-info": {
+            "post": {
+                "description": "获取系统信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "系统"
+                ],
+                "summary": "获取系统信息",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SystemInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.JSONResult"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -182,6 +216,14 @@
                 },
                 "sort_by": {
                     "type": "string"
+                }
+            }
+        },
+        "model.SystemInfo": {
+            "type": "object",
+            "properties": {
+                "goroutine_number": {
+                    "type": "integer"
                 }
             }
         }

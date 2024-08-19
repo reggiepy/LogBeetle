@@ -3,7 +3,6 @@ package sub
 import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/boot"
-	"github.com/reggiepy/LogBeetle/pkg/consumer/manager"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,7 +11,6 @@ import (
 	"github.com/reggiepy/LogBeetle/goutils/enumUtils"
 	"github.com/reggiepy/LogBeetle/version"
 
-	"github.com/reggiepy/LogBeetle/pkg/consumer"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -70,55 +68,14 @@ func StartServer() {
 	global.LbViper = boot.Viper()
 	global.LbLogger = boot.Log()
 	global.LbNsqProducer = boot.NsqProducer()
+	boot.Consumer()
 	boot.Boot()
-
-	// 获取配置
-	nsqConfig := global.LbConfig.NSQConfig
-	consumerConfig := global.LbConfig.ConsumerConfig
-
-	if len(consumerConfig.NSQConsumers) == 0 {
-		handleError(fmt.Errorf("consumer config is empty"))
-	}
-
-	consumerManager := &manager.Manager{}
-
-	// 创建并添加主消费者
-	c, err := consumer.NewNSQLogConsumer(
-		consumer.WithName("test"),
-		consumer.WithLogFileName("test.log"),
-		consumer.WithNSQTopic("test"),
-		consumer.WithNSQAddress(nsqConfig.NSQDAddress),
-		consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
-	)
-	if err != nil {
-		handleError(fmt.Errorf("error creating consumer %s: %v", "test", err))
-	} else {
-		consumerManager.Add(c)
-		global.LbLogger.Info(fmt.Sprintf("consumer %s added to consumer manager", "test"))
-	}
-
-	// 添加其他消费者
-	for _, cfg := range consumerConfig.NSQConsumers {
-		c, err := consumer.NewNSQLogConsumer(
-			consumer.WithName(cfg.Name),
-			consumer.WithLogFileName(cfg.FileName),
-			consumer.WithNSQTopic(cfg.Topic),
-			consumer.WithNSQAddress(nsqConfig.NSQDAddress),
-			consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
-		)
-		if err != nil {
-			handleError(fmt.Errorf("error creating consumer %s: %v", cfg.Topic, err))
-		} else {
-			consumerManager.Add(c)
-			global.LbLogger.Info(fmt.Sprintf("consumer %s added to consumer manager", cfg.Name))
-		}
-	}
 
 	// 捕获信号，以优雅地退出程序
 	waitForShutdown()
 
 	// 关闭资源
-	cleanup(consumerManager)
+	cleanup()
 	fmt.Println("Main program stopped")
 }
 
@@ -128,16 +85,10 @@ func waitForShutdown() {
 	<-sigCh
 }
 
-func cleanup(cm *manager.Manager) {
+func cleanup() {
 	global.LbNsqProducer.Stop()
 	global.LbLogger.Info("NSQ producer stopped")
-	cm.Stop()
+	global.LBConsumerManager.Stop()
 	global.LbLogger.Info("NSQ consumer stopped")
 	_ = global.LbLogger.Sync() // 确保在程序退出时刷新日志缓冲区
-}
-
-func handleError(err error) {
-	if err != nil {
-		global.LbLogger.Fatal(err.Error())
-	}
 }
