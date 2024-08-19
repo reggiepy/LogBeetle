@@ -2,8 +2,10 @@ package consumer
 
 import (
 	"fmt"
+	"go.uber.org/multierr"
 	"io"
 	"path"
+	"sync"
 	"time"
 
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -22,6 +24,8 @@ type NSQLogConsumer struct {
 	// Logger    zerolog.Logger
 	Logger *zap.Logger
 
+	once *sync.Once
+
 	// Consumer
 	NSQTopic      string
 	NSQAddress    string
@@ -32,23 +36,31 @@ type NSQLogConsumer struct {
 
 func (c *NSQLogConsumer) Close() error {
 	var err error
-	if c.NSQConsumer != nil {
-		c.NSQConsumer.Stop()
-		global.LbLogger.Info(fmt.Sprintf("closing consumer 【%s】 nsq", c.Name))
-	}
-	if c.LogFile != nil {
-		err = c.Logger.Sync()
-		if err != nil {
-			return fmt.Errorf("sync 【%s】  Logger faild: %v", c.Name, err)
+
+	// 确保 Close 只执行一次
+	c.once.Do(func() {
+		if c.NSQConsumer != nil {
+			c.NSQConsumer.Stop()
+			global.LbLogger.Info(fmt.Sprintf("closing consumer 【%s】 nsq", c.Name))
 		}
-		global.LbLogger.Info(fmt.Sprintf("sync consumer 【%s】 logger", c.Name))
-		err = c.LogFile.Close()
-		if err != nil {
-			return fmt.Errorf("closing 【%s】 logfile faild: %v", c.Name, err)
+
+		if c.LogFile != nil {
+			// 尝试同步日志
+			if syncErr := c.Logger.Sync(); syncErr != nil {
+				err = multierr.Append(err, fmt.Errorf("sync 【%s】 Logger failed: %v", c.Name, syncErr))
+			} else {
+				global.LbLogger.Info(fmt.Sprintf("sync consumer 【%s】 logger", c.Name))
+			}
+
+			// 尝试关闭日志文件
+			if closeErr := c.LogFile.Close(); closeErr != nil {
+				err = multierr.Append(err, fmt.Errorf("closing 【%s】 logfile failed: %v", c.Name, closeErr))
+			} else {
+				global.LbLogger.Info(fmt.Sprintf("closing consumer 【%s】 logger file", c.Name))
+			}
 		}
-		global.LbLogger.Info(fmt.Sprintf("closing consumer 【%s】 logger file", c.Name))
-	}
-	return nil
+	})
+	return err
 }
 
 // initializeNSQConsumer initializes the NSQ consumer.
