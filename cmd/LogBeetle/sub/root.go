@@ -1,13 +1,11 @@
 package sub
 
 import (
-	"context"
 	"fmt"
 	"github.com/reggiepy/LogBeetle/boot"
 	"github.com/reggiepy/LogBeetle/pkg/consumer/manager"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 
 	"github.com/reggiepy/LogBeetle/global"
@@ -15,7 +13,6 @@ import (
 	"github.com/reggiepy/LogBeetle/version"
 
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
-	"github.com/reggiepy/LogBeetle/pkg/worker"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -69,88 +66,78 @@ func Execute() {
 }
 
 func StartServer() {
+	// 初始化全局组件
 	global.LbViper = boot.Viper()
 	global.LbLogger = boot.Log()
 	global.LbNsqProducer = boot.NsqProducer()
 	boot.Boot()
-	// 创建一个上下文，以便能够在主程序退出时取消所有 Goroutine
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
-	// 使用 WaitGroup 等待所有 Goroutine 结束
-	var wg sync.WaitGroup
 	// 获取配置
 	nsqConfig := global.LbConfig.NSQConfig
 	consumerConfig := global.LbConfig.ConsumerConfig
+
 	if len(consumerConfig.NSQConsumers) == 0 {
-		_ = fmt.Errorf("consumer config is empty")
+		handleError(fmt.Errorf("consumer config is empty"))
 	}
 
 	consumerManager := &manager.Manager{}
 
-	// 定义工作线程
-	workers := []*worker.Worker{
-		// NSQ 生产者和消费者
-		worker.NewWorker(
-			worker.WithName("nsq worker"),
-			worker.WithCtx(ctx),
-			worker.WithWg(&wg),
-			worker.WithStop(func() {
-				global.LbNsqProducer.Stop()
-				global.LbLogger.Info(fmt.Sprintf("nsq product close."))
-				consumerManager.Stop()
-			}),
-			worker.WithStart(func() {
-				c, err := consumer.NewNSQLogConsumer(
-					consumer.WithName("test"),
-					consumer.WithLogFileName("test.log"),
-					consumer.WithNSQTopic("test"),
-					consumer.WithNSQAddress(nsqConfig.NSQDAddress),
-					consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
-				)
-				if err != nil {
-					global.LbLogger.Fatal(fmt.Sprintf("error creating consumer %s: %v", "test", err))
-				} else {
-					consumerManager.Add(c)
-					global.LbLogger.Info(fmt.Sprintf("consumer %s add to consumer manager", "test"))
-				}
-
-				// 添加其他消费者
-				for _, consumerConfig := range consumerConfig.NSQConsumers {
-					c, err := consumer.NewNSQLogConsumer(
-						consumer.WithName(consumerConfig.Name),
-						consumer.WithLogFileName(consumerConfig.FileName),
-						consumer.WithNSQTopic(consumerConfig.Topic),
-						consumer.WithNSQAddress(nsqConfig.NSQDAddress),
-						consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
-					)
-					if err != nil {
-						global.LbLogger.Fatal(fmt.Sprintf("error creating consumer %s: %v", consumerConfig.Topic, err))
-					} else {
-						consumerManager.Add(c)
-						global.LbLogger.Info(fmt.Sprintf("consumer %s add to consumer manager", consumerConfig.Name))
-					}
-				}
-			}),
-		),
+	// 创建并添加主消费者
+	c, err := consumer.NewNSQLogConsumer(
+		consumer.WithName("test"),
+		consumer.WithLogFileName("test.log"),
+		consumer.WithNSQTopic("test"),
+		consumer.WithNSQAddress(nsqConfig.NSQDAddress),
+		consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
+	)
+	if err != nil {
+		handleError(fmt.Errorf("error creating consumer %s: %v", "test", err))
+	} else {
+		consumerManager.Add(c)
+		global.LbLogger.Info(fmt.Sprintf("consumer %s added to consumer manager", "test"))
 	}
 
-	defer global.LbLogger.Sync() // 确保在程序退出时刷新日志缓冲区
-
-	// 启动工作线程
-	for _, w := range workers {
-		wg.Add(1)
-		w.Run()
+	// 添加其他消费者
+	for _, cfg := range consumerConfig.NSQConsumers {
+		c, err := consumer.NewNSQLogConsumer(
+			consumer.WithName(cfg.Name),
+			consumer.WithLogFileName(cfg.FileName),
+			consumer.WithNSQTopic(cfg.Topic),
+			consumer.WithNSQAddress(nsqConfig.NSQDAddress),
+			consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
+		)
+		if err != nil {
+			handleError(fmt.Errorf("error creating consumer %s: %v", cfg.Topic, err))
+		} else {
+			consumerManager.Add(c)
+			global.LbLogger.Info(fmt.Sprintf("consumer %s added to consumer manager", cfg.Name))
+		}
 	}
 
 	// 捕获信号，以优雅地退出程序
+	waitForShutdown()
+
+	// 关闭资源
+	cleanup(consumerManager)
+	fmt.Println("Main program stopped")
+}
+
+func waitForShutdown() {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	<-sigCh
+}
 
-	// 取消所有 Goroutine
-	cancel()
-	wg.Wait()
+func cleanup(cm *manager.Manager) {
+	global.LbNsqProducer.Stop()
+	global.LbLogger.Info("NSQ producer stopped")
+	cm.Stop()
+	global.LbLogger.Info("NSQ consumer stopped")
+	_ = global.LbLogger.Sync() // 确保在程序退出时刷新日志缓冲区
+}
 
-	fmt.Println("Main program stopped")
+func handleError(err error) {
+	if err != nil {
+		global.LbLogger.Fatal(err.Error())
+	}
 }
