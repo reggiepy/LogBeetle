@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"path"
+	"time"
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
@@ -26,10 +27,15 @@ type NSQLogConsumer struct {
 	NSQAddress    string
 	NSQAuthSecret string
 	NSQConsumer   *nsq.Consumer
+	Handler       func(message []byte) error
 }
 
 func (c *NSQLogConsumer) Close() error {
 	var err error
+	if c.NSQConsumer != nil {
+		c.NSQConsumer.Stop()
+		global.LbLogger.Info(fmt.Sprintf("closing consumer 【%s】 nsq", c.Name))
+	}
 	if c.LogFile != nil {
 		err = c.Logger.Sync()
 		if err != nil {
@@ -41,10 +47,6 @@ func (c *NSQLogConsumer) Close() error {
 			return fmt.Errorf("closing 【%s】 logfile faild: %v", c.Name, err)
 		}
 		global.LbLogger.Info(fmt.Sprintf("closing consumer 【%s】 logger file", c.Name))
-	}
-	if c.NSQConsumer != nil {
-		c.NSQConsumer.Stop()
-		global.LbLogger.Info(fmt.Sprintf("closing consumer 【%s】 nsq", c.Name))
 	}
 	return nil
 }
@@ -61,7 +63,7 @@ func (c *NSQLogConsumer) initializeNSQConsumer() error {
 			return fmt.Errorf("failed to set auth_secret: %v", err)
 		}
 	}
-
+	cfg.LookupdPollInterval = 10 * time.Second
 	consumer, err := nsq.NewConsumer(c.NSQTopic, "consumer", cfg)
 	if err != nil {
 		return fmt.Errorf("failed to create NSQ consumer: %v", err)
@@ -86,13 +88,16 @@ func (c *NSQLogConsumer) initializeLogger() error {
 	logger := NewZAPLogger(lj)
 	c.Logger = logger
 	c.LogFile = lj
-
-	c.NSQConsumer.AddHandler(&MessageHandler{
-		Handler: func(message []byte) error {
-			c.Logger.Info(string(message))
+	c.NSQConsumer.AddHandler(nsq.HandlerFunc(func(m *nsq.Message) error {
+		if len(m.Body) == 0 {
+			// Returning nil will automatically send a FIN command to NSQ to mark the message as processed.
+			// In this case, a message with an empty body is simply ignored/discarded.
 			return nil
-		},
-	})
+		}
+		c.Logger.Info(string(m.Body))
+		return nil
+	},
+	))
 
 	return nil
 }
