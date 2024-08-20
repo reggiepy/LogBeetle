@@ -3,13 +3,10 @@ package sub
 import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/boot"
-	"os"
-	"os/signal"
-	"syscall"
-
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/goutils/enumUtils"
 	"github.com/reggiepy/LogBeetle/version"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -52,7 +49,11 @@ var rootCmd = cobra.Command{
 			fmt.Println(version.Full())
 			return nil
 		}
-		StartServer()
+		global.LbViper = boot.Viper()
+		global.LbLogger = boot.Log()
+		global.LbNsqProducer = boot.NsqProducer()
+		boot.Consumer()
+		boot.Boot()
 		return nil
 	},
 }
@@ -61,34 +62,4 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
-}
-
-func StartServer() {
-	// 初始化全局组件
-	global.LbViper = boot.Viper()
-	global.LbLogger = boot.Log()
-	global.LbNsqProducer = boot.NsqProducer()
-	boot.Consumer()
-	boot.Boot()
-
-	// 捕获信号，以优雅地退出程序
-	waitForShutdown()
-
-	// 关闭资源
-	cleanup()
-	fmt.Println("Main program stopped")
-}
-
-func waitForShutdown() {
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-	<-sigCh
-}
-
-func cleanup() {
-	global.LbNsqProducer.Stop()
-	global.LbLogger.Info("NSQ producer stopped")
-	global.LBConsumerManager.Stop()
-	global.LbLogger.Info("NSQ consumer stopped")
-	_ = global.LbLogger.Sync() // 确保在程序退出时刷新日志缓冲区
 }

@@ -2,11 +2,12 @@ package consumer
 
 import (
 	"fmt"
-	"go.uber.org/multierr"
 	"io"
 	"path"
 	"sync"
 	"time"
+
+	"go.uber.org/multierr"
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
@@ -21,10 +22,11 @@ type NSQLogConsumer struct {
 	Name        string
 	LogFileName string
 	LogFile     io.WriteCloser
-	// Logger    zerolog.Logger
-	Logger *zap.Logger
+	Logger      *zap.Logger
 
-	once *sync.Once
+	stopOnce  sync.Once
+	startOnce sync.Once
+	isStarted bool
 
 	// Consumer
 	NSQTopic      string
@@ -34,11 +36,11 @@ type NSQLogConsumer struct {
 	Handler       func(message []byte) error
 }
 
-func (c *NSQLogConsumer) Close() error {
+func (c *NSQLogConsumer) Stop() error {
 	var err error
 
 	// 确保 Close 只执行一次
-	c.once.Do(func() {
+	c.stopOnce.Do(func() {
 		if c.NSQConsumer != nil {
 			c.NSQConsumer.Stop()
 			global.LbLogger.Info(fmt.Sprintf("closing consumer 【%s】 nsq", c.Name))
@@ -61,6 +63,29 @@ func (c *NSQLogConsumer) Close() error {
 		}
 	})
 	return err
+}
+
+func (c *NSQLogConsumer) Topic() string {
+	return c.NSQTopic
+}
+
+// Start nsq consumer.
+func (c *NSQLogConsumer) Start() error {
+	go func() {
+		c.startOnce.Do(func() {
+			for {
+				err := c.NSQConsumer.ConnectToNSQD(c.NSQAddress)
+				if err == nil {
+					global.LbLogger.Info(fmt.Sprintf("Successfully connected to nsqlookupd."))
+					c.isStarted = true
+					break
+				}
+				global.LbLogger.Info(fmt.Sprintf("Failed to connect to nsqlookupd: %v. Retrying in 5 seconds...", err))
+				time.Sleep(5 * time.Second) // 连接失败后等待 5 秒再重试
+			}
+		})
+	}()
+	return nil
 }
 
 // initializeNSQConsumer initializes the NSQ consumer.
@@ -114,19 +139,6 @@ func (c *NSQLogConsumer) initializeLogger() error {
 	return nil
 }
 
-// connectToNSQ connects the consumer to the NSQ.
-func (c *NSQLogConsumer) connectToNSQ() error {
-	if err := c.NSQConsumer.ConnectToNSQD(c.NSQAddress); err != nil {
-		return fmt.Errorf("failed to connect to NSQ: %v", err)
-	}
-	c.RegisterTopic(c.NSQTopic)
-	return nil
-}
-
-func (c *NSQLogConsumer) RegisterTopic(topic ...string) {
-	global.LbRegisterTopic = append(global.LbRegisterTopic, topic...)
-}
-
 func NewNSQLogConsumer(opts ...Options) (*NSQLogConsumer, error) {
 	c := &NSQLogConsumer{}
 	for _, opt := range opts {
@@ -152,11 +164,5 @@ func NewNSQLogConsumer(opts ...Options) (*NSQLogConsumer, error) {
 	if err := c.initializeLogger(); err != nil {
 		return nil, err
 	}
-
-	// Register topic and connect to NSQ
-	if err := c.connectToNSQ(); err != nil {
-		return nil, err
-	}
-
 	return c, nil
 }

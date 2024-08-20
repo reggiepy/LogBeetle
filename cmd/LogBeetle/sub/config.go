@@ -29,8 +29,7 @@ var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "config tools",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println(cmd.Help())
-		return nil
+		return cmd.Help()
 	},
 }
 

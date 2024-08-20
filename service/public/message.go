@@ -11,7 +11,7 @@ import (
 type ServiceMessage struct{}
 
 func (m *ServiceMessage) SendMessage(projectName string, message string) error {
-	if !arrayUtils.InArray(projectName, global.LbRegisterTopic) {
+	if !arrayUtils.InArray(projectName, global.LBConsumerManager.Topics()) {
 		return fmt.Errorf("topic【%s】 is not allowed\n", projectName)
 	}
 	start := time.Now()

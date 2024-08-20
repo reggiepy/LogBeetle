@@ -49,4 +49,5 @@ func Consumer() {
 		}
 	}
 
+	global.LBConsumerManager.Start()
 }

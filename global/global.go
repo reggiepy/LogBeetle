@@ -15,9 +15,6 @@ var (
 	LbViper     *viper.Viper
 	LbLogger    *zap.Logger
 
-	//	注册的topic
-	LbRegisterTopic []string
-
 	// NSQ
 	LbNsqProducer     *nsq.Producer
 	LBConsumerManager *manager.Manager

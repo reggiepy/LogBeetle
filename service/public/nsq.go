@@ -18,9 +18,9 @@ func max(a, b int) int {
 func (s *ServiceNsq) RegisterTopic(requestNsqTopicList model.RequestGetNsqTopicList) (error, []string, int64) {
 	pageSize := requestNsqTopicList.PageSize
 	offset := requestNsqTopicList.PageSize * max(requestNsqTopicList.Page-1, 0)
-	total := len(global.LbRegisterTopic)
+	total := len(global.LBConsumerManager.Topics())
 	dataList := make([]string, total)
-	copy(dataList, global.LbRegisterTopic)
+	copy(dataList, global.LBConsumerManager.Topics())
 	if requestNsqTopicList.Desc {
 		sort.Sort(sort.Reverse(sort.StringSlice(dataList)))
 	} else {
