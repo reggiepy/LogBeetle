@@ -8,6 +8,8 @@ type Config struct {
 	LogConfig      LogConfig      `yaml:"LogConfig"`
 	ConsumerConfig ConsumerConfig `yaml:"ConsumerConfig"`
 	NSQConfig      NSQConfig      `yaml:"NSQConfig"`
+	Store          Store          `yaml:"Store"`
+	Search         Search         `yaml:"Search"`
 }
 type LogConfig struct {
 	LogFile    string `yaml:"LogFile"`    // 日志文件名
@@ -31,4 +33,20 @@ type NSQConsumers struct {
 	Name     string `yaml:"Name"`
 	Topic    string `yaml:"Topic"`
 	FileName string `yaml:"FileName"`
+}
+
+type Store struct {
+	Root                 string `yaml:"Root"`
+	ChanLength           int    `yaml:"ChanLength"`
+	AutoAddDate          bool   `yaml:"AutoAddDate"`
+	NameAutoAddDate bool   `yaml:"NameAutoAddDate"`
+	SaveDays             int    `yaml:"SaveDays"`
+	MaxIdleTime          int    `yaml:"MaxIdleTime"`
+	GoMaxProcessIdx      int    `yaml:"GoMaxProcessIdx"`
+}
+
+type Search struct {
+	PageSize  int  `yaml:"PageSize"`
+	NearSearchSize  int  `yaml:"NearSearchSize"`
+	MultiLineSearch bool `yaml:"MultiLineSearch"`
 }

@@ -14,7 +14,7 @@ type ApiSystem struct {
 // @Accept json
 // @Produce json
 //
-// @Param request body model.SystemInfo true "请求参数"
+// @Param request body model.SystemInfoRequest true "请求参数"
 //
 // @Success      200  {object}   model.JSONResult
 // @Router /log-beetle/v1/system/system-info [post]

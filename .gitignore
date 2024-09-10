@@ -2,7 +2,7 @@
 ### Example user template
 *.log
 !.gitkeep
-log-beetle.yaml
+log-beetle1.yaml
 # IntelliJ project files
 .idea
 *.iml

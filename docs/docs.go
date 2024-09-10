@@ -61,6 +61,107 @@ const docTemplate = `{
                 }
             }
         },
+        "/log-beetle/v1/log/add": {
+            "post": {
+                "description": "添加日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "日志管理"
+                ],
+                "summary": "添加日志",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/logdata.LogDataModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.JSONResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/log-beetle/v1/log/addTestData": {
+            "post": {
+                "description": "添加测试日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "日志管理"
+                ],
+                "summary": "添加测试日志",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.JSONResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/log-beetle/v1/log/search": {
+            "post": {
+                "description": "日志搜索",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "日志管理"
+                ],
+                "summary": "搜索日志",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SearchRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.JSONResult"
+                        }
+                    }
+                }
+            }
+        },
         "/log-beetle/v1/nsq/register-topic": {
             "post": {
                 "description": "发送消息到 NSQ",
@@ -157,6 +258,86 @@ const docTemplate = `{
                 }
             }
         },
+        "/log-beetle/v1/store/delete": {
+            "post": {
+                "description": "删除指定日志仓",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "日志存储管理"
+                ],
+                "summary": "删除指定日志仓",
+                "parameters": [
+                    {
+                        "description": "请求参数",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SearchRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.JSONResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/log-beetle/v1/store/list": {
+            "post": {
+                "description": "查询日志仓信息列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "日志存储管理"
+                ],
+                "summary": "查询日志仓信息列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.JSONResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/log-beetle/v1/store/names": {
+            "post": {
+                "description": "查询日志仓名称列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "日志存储管理"
+                ],
+                "summary": "查询日志仓名称列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.JSONResult"
+                        }
+                    }
+                }
+            }
+        },
         "/log-beetle/v1/system/system-info": {
             "post": {
                 "description": "获取系统信息",
@@ -177,7 +358,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.SystemInfo"
+                            "$ref": "#/definitions/model.SystemInfoRequest"
                         }
                     }
                 ],
@@ -193,6 +374,59 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "logdata.LogDataModel": {
+            "type": "object",
+            "properties": {
+                "clientip": {
+                    "description": "客户端IP",
+                    "type": "string"
+                },
+                "date": {
+                    "description": "日期（格式YYYY-MM-DD HH:MM:SS.SSS）",
+                    "type": "string"
+                },
+                "detail": {
+                    "description": "【内部字段】多行时的详细日志信息，通常是包含错误堆栈等的日志内容",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "从1开始递增",
+                    "type": "string"
+                },
+                "loglevel": {
+                    "description": "日志级别（debug、info、warn、error）",
+                    "type": "string"
+                },
+                "serverip": {
+                    "description": "服务器IP",
+                    "type": "string"
+                },
+                "servername": {
+                    "description": "服务器名",
+                    "type": "string"
+                },
+                "storename": {
+                    "description": "日志仓名称（未存储，仅赋值给前端使用）",
+                    "type": "string"
+                },
+                "system": {
+                    "description": "系统名",
+                    "type": "string"
+                },
+                "text": {
+                    "description": "【必须】日志内容，多行时仅为首行，直接显示用，是全文检索对象",
+                    "type": "string"
+                },
+                "traceid": {
+                    "description": "跟踪ID",
+                    "type": "string"
+                },
+                "user": {
+                    "description": "用户",
+                    "type": "string"
+                }
+            }
+        },
         "model.AboutResponse": {
             "type": "object",
             "properties": {
@@ -230,13 +464,65 @@ const docTemplate = `{
                 }
             }
         },
-        "model.SystemInfo": {
+        "model.SearchRequest": {
             "type": "object",
             "properties": {
-                "goroutine_number": {
-                    "type": "integer"
+                "current_id": {
+                    "description": "当前ID",
+                    "type": "string"
+                },
+                "current_store_name": {
+                    "description": "当前门店名称",
+                    "type": "string"
+                },
+                "datetime_from": {
+                    "description": "开始时间",
+                    "type": "string"
+                },
+                "datetime_to": {
+                    "description": "结束时间",
+                    "type": "string"
+                },
+                "forward": {
+                    "description": "前向（可能是方向或者其他标识）",
+                    "type": "string"
+                },
+                "log_level": {
+                    "description": "日志级别",
+                    "type": "string"
+                },
+                "near_store_name": {
+                    "description": "邻近门店名称",
+                    "type": "string"
+                },
+                "new_near_id": {
+                    "description": "新邻近ID",
+                    "type": "string"
+                },
+                "old_near_id": {
+                    "description": "旧邻近ID",
+                    "type": "string"
+                },
+                "search_key": {
+                    "description": "消费者信息",
+                    "type": "string"
+                },
+                "store_name": {
+                    "description": "门店名称编号或ID",
+                    "type": "string"
+                },
+                "system": {
+                    "description": "系统信息",
+                    "type": "string"
+                },
+                "user": {
+                    "description": "用户信息",
+                    "type": "string"
                 }
             }
+        },
+        "model.SystemInfoRequest": {
+            "type": "object"
         }
     }
 }`

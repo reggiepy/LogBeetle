@@ -18,4 +18,19 @@ var (
 	// NSQ
 	LbNsqProducer     *nsq.Producer
 	LBConsumerManager *manager.Manager
+
+	LbExitFunc []func()
+
+	//	系统信息
+	StartTime = time.Now().Format("2006-01-02 15:04:05")
 )
+
+func OnExit(f ...func()) {
+	LbExitFunc = append(LbExitFunc, f...)
+}
+
+func Exit() {
+	for _, fnExit := range LbExitFunc {
+		fnExit()
+	}
+}

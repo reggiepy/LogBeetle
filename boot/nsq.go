@@ -6,7 +6,7 @@ import (
 	"github.com/reggiepy/LogBeetle/global"
 )
 
-func NsqProducer() *nsq.Producer {
+func NsqProducer() {
 	var (
 		err error
 	)
@@ -20,5 +20,11 @@ func NsqProducer() *nsq.Producer {
 	if err != nil {
 		global.LbLogger.Fatal(fmt.Sprintf("Failed to create producer: %v", err))
 	}
-	return producer
+
+	global.OnExit(func() {
+		global.LbNsqProducer.Stop()
+		global.LbLogger.Info("NSQ producer stopped")
+	})
+
+	global.LbNsqProducer = producer
 }

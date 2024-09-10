@@ -47,20 +47,21 @@ func (c *Config) NewLogger(opts ...Option) (*zap.Logger, error) {
 		MaxAge:     c.MaxAge,
 		Compress:   c.Compress,
 	}
-	writeSyncer := zapcore.AddSync(lj)
 
 	logFormat := "json"
 	if logFormats.Has(c.LogFormat) {
 		logFormat = c.LogFormat
 	}
-	encoder := NewEncoder(logFormat)
-
 	// 日志打印级别
 	l, err := zapcore.ParseLevel(c.LogLevel)
 	if err != nil {
 		l = zapcore.InfoLevel
 	}
-	core := zapcore.NewCore(encoder, writeSyncer, l)
+	core := zapcore.NewCore(
+		NewEncoder(logFormat),
+		zapcore.AddSync(lj),
+		l,
+	)
 
 	logger = zap.New(core, zap.AddCaller()) // zap.Addcaller() 输出日志打印文件和行数如： logger/logger_test.go:33
 	// 1. zap.ReplaceGlobals 函数将当前初始化的 logger 替换到全局的 logger,

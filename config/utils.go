@@ -31,6 +31,20 @@ func DefaultConfig() *Config {
 			AuthSecret:  "",
 			NSQDAddress: "127.0.0.1:4150",
 		},
+		Store: Store{
+			Root:                 "/store",
+			ChanLength:           64,
+			AutoAddDate:          false,
+			NameAutoAddDate: true,
+			SaveDays:             180,
+			MaxIdleTime:          300,
+			GoMaxProcessIdx:      -1,
+		},
+		Search: Search{
+			PageSize: 100,
+			NearSearchSize: 200,
+			MultiLineSearch: false,
+		},
 	}
 }
 

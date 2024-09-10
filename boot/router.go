@@ -32,17 +32,16 @@ func Router() *gin.Engine {
 	docs.SwaggerInfo.Host = "127.0.0.1:1233"
 	docs.SwaggerInfo.BasePath = "/"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
-	if global.LbConfig.Env == "dev" {
-		gin.SetMode(gin.DebugMode)
-	} else {
+	if global.LbConfig.Env == "prod" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	// r := gin.Default()
 	r := gin.New()
 
 	// 注册全局中间件
-	r.Use(middleware.ErrorHandler())
 	r.Use(middleware.RequestID())
+	r.Use(middleware.ErrorHandler(global.LbLogger))
+	r.Use(middleware.GinLogger(global.LbLogger))
 	r.Use(middleware.Cors())
 
 	group := r.Group("log-beetle")
@@ -68,6 +67,8 @@ func RouterPublic(PublicGroup *gin.RouterGroup) {
 		routerPublic.RouterIndex.InitIndexRouter(PublicGroup)
 		routerPublic.RouterNsq.InitRouterNsq(PublicGroup)
 		routerPublic.RouterSystem.InitRouterSystem(PublicGroup)
+		routerPublic.RouterLog.InitRouterLog(PublicGroup)
+		routerPublic.RouterStorageMnt.InitRouterStorageMntRouter(PublicGroup)
 	}
 }
 

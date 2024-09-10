@@ -10,8 +10,12 @@ type ServiceSystem struct {
 }
 
 func (s *ServiceSystem) SystemInfo() (error, model.SystemInfoResponse) {
-	ret := model.SystemInfoResponse{ConsumerInfo: model.ConsumerInfo{}}
-	ret.GoroutineNumber = runtime.NumGoroutine()
-	ret.ConsumerInfo.ConsumerCount = global.LBConsumerManager.Count()
+	ret := model.SystemInfoResponse{
+		ConsumerInfo: model.ConsumerInfo{
+			ConsumerCount: global.LBConsumerManager.Count(),
+		},
+		StartTime:       global.StartTime,
+		GoroutineNumber: runtime.NumGoroutine(),
+	}
 	return nil, ret
 }

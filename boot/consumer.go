@@ -3,8 +3,8 @@ package boot
 import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/pkg/consumer"
 	"github.com/reggiepy/LogBeetle/pkg/consumer/manager"
+	"github.com/reggiepy/LogBeetle/pkg/consumer/nsq_consumer"
 )
 
 func Consumer() {
@@ -18,12 +18,12 @@ func Consumer() {
 	}
 
 	// 创建并添加主消费者
-	c, err := consumer.NewNSQLogConsumer(
-		consumer.WithName("test"),
-		consumer.WithLogFileName("test.log"),
-		consumer.WithNSQTopic("test"),
-		consumer.WithNSQAddress(nsqConfig.NSQDAddress),
-		consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
+	c, err := nsq_consumer.NewNSQLogConsumer(
+		nsq_consumer.WithName("test"),
+		nsq_consumer.WithLogFileName("test.log"),
+		nsq_consumer.WithNSQTopic("test"),
+		nsq_consumer.WithNSQAddress(nsqConfig.NSQDAddress),
+		nsq_consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
 	)
 	if err != nil {
 		global.LbLogger.Fatal(fmt.Sprintf("error creating consumer %s: %v", "test", err))
@@ -34,12 +34,16 @@ func Consumer() {
 
 	// 添加其他消费者
 	for _, cfg := range consumerConfig.NSQConsumers {
-		c, err := consumer.NewNSQLogConsumer(
-			consumer.WithName(cfg.Name),
-			consumer.WithLogFileName(cfg.FileName),
-			consumer.WithNSQTopic(cfg.Topic),
-			consumer.WithNSQAddress(nsqConfig.NSQDAddress),
-			consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
+		var topic string
+		if cfg.Topic == "" {
+			topic = cfg.Name
+		}
+		c, err := nsq_consumer.NewNSQLogConsumer(
+			nsq_consumer.WithName(cfg.Name),
+			nsq_consumer.WithLogFileName(cfg.FileName),
+			nsq_consumer.WithNSQTopic(topic),
+			nsq_consumer.WithNSQAddress(nsqConfig.NSQDAddress),
+			nsq_consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),
 		)
 		if err != nil {
 			global.LbLogger.Fatal(fmt.Sprintf("error creating consumer %s: %v", cfg.Topic, err))
@@ -50,4 +54,8 @@ func Consumer() {
 	}
 
 	global.LBConsumerManager.Start()
+	global.OnExit(func() {
+		global.LBConsumerManager.Stop()
+		global.LbLogger.Info("NSQ consumer stopped")
+	})
 }

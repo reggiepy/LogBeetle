@@ -5,6 +5,7 @@ import (
 	"github.com/reggiepy/LogBeetle/boot"
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/goutils/enumUtils"
+	"github.com/reggiepy/LogBeetle/ldb"
 	"github.com/reggiepy/LogBeetle/version"
 	"os"
 
@@ -51,7 +52,10 @@ var rootCmd = cobra.Command{
 		}
 		global.LbViper = boot.Viper()
 		global.LbLogger = boot.Log()
-		global.LbNsqProducer = boot.NsqProducer()
+		boot.NsqProducer()
+		boot.Ldb()
+		// 默认引擎空转一下，触发未建索引继续建
+		go ldb.NewDefaultEngine().AddTextLog("", "", "")
 		boot.Consumer()
 		boot.Boot()
 		return nil
