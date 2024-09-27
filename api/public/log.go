@@ -77,7 +77,7 @@ func (a *ApiLog) AddTestData(c *gin.Context) {
 // @Accept json
 // @Produce json
 //
-// @Param request body logdata.LogDataModel true "请求参数"
+// @Param request body model.AddLogRequest true "请求参数"
 //
 // @Success      200  {object}   model.JSONResult
 // @router      /log-beetle/v1/log/add   [post]

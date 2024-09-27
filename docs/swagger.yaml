@@ -1,14 +1,16 @@
 definitions:
-  logdata.LogDataModel:
+  model.AboutResponse:
+    properties:
+      title:
+        type: string
+    type: object
+  model.AddLogRequest:
     properties:
       clientip:
         description: 客户端IP
         type: string
       date:
         description: 日期（格式YYYY-MM-DD HH:MM:SS.SSS）
-        type: string
-      detail:
-        description: 【内部字段】多行时的详细日志信息，通常是包含错误堆栈等的日志内容
         type: string
       id:
         description: 从1开始递增
@@ -21,9 +23,6 @@ definitions:
         type: string
       servername:
         description: 服务器名
-        type: string
-      storename:
-        description: 日志仓名称（未存储，仅赋值给前端使用）
         type: string
       system:
         description: 系统名
@@ -38,9 +37,9 @@ definitions:
         description: 用户
         type: string
     type: object
-  model.AboutResponse:
+  model.DeleteStoreRequest:
     properties:
-      title:
+      store_name:
         type: string
     type: object
   model.JSONResult:
@@ -150,7 +149,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/logdata.LogDataModel'
+          $ref: '#/definitions/model.AddLogRequest'
       produces:
       - application/json
       responses:
@@ -278,7 +277,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/model.SearchRequest'
+          $ref: '#/definitions/model.DeleteStoreRequest'
       produces:
       - application/json
       responses:

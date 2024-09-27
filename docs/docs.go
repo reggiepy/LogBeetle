@@ -81,7 +81,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/logdata.LogDataModel"
+                            "$ref": "#/definitions/model.AddLogRequest"
                         }
                     }
                 ],
@@ -278,7 +278,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.SearchRequest"
+                            "$ref": "#/definitions/model.DeleteStoreRequest"
                         }
                     }
                 ],
@@ -374,7 +374,15 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "logdata.LogDataModel": {
+        "model.AboutResponse": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.AddLogRequest": {
             "type": "object",
             "properties": {
                 "clientip": {
@@ -383,10 +391,6 @@ const docTemplate = `{
                 },
                 "date": {
                     "description": "日期（格式YYYY-MM-DD HH:MM:SS.SSS）",
-                    "type": "string"
-                },
-                "detail": {
-                    "description": "【内部字段】多行时的详细日志信息，通常是包含错误堆栈等的日志内容",
                     "type": "string"
                 },
                 "id": {
@@ -403,10 +407,6 @@ const docTemplate = `{
                 },
                 "servername": {
                     "description": "服务器名",
-                    "type": "string"
-                },
-                "storename": {
-                    "description": "日志仓名称（未存储，仅赋值给前端使用）",
                     "type": "string"
                 },
                 "system": {
@@ -427,10 +427,10 @@ const docTemplate = `{
                 }
             }
         },
-        "model.AboutResponse": {
+        "model.DeleteStoreRequest": {
             "type": "object",
             "properties": {
-                "title": {
+                "store_name": {
                     "type": "string"
                 }
             }

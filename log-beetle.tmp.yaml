@@ -19,3 +19,14 @@ ConsumerConfig:
 NSQConfig:
   AuthSecret: ""
   NSQDAddress: ""
+Store:
+  Root: ./store
+  ChanLength: 64
+  AutoAddDate: true
+  SaveDays: 180
+  MaxIdleTime: 300
+  GoMaxProcessIdx: -1
+Search:
+  PageSize: 100
+  NearSearchSize: 200
+  MultiLineSearch: false

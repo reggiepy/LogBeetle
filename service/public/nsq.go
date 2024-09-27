@@ -3,6 +3,7 @@ package public
 import (
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/model"
+	"github.com/reggiepy/LogBeetle/pkg/consumer"
 	"sort"
 )
 
@@ -18,9 +19,8 @@ func max(a, b int) int {
 func (s *ServiceNsq) RegisterTopic(requestNsqTopicList model.RequestGetNsqTopicList) (error, []string, int64) {
 	pageSize := requestNsqTopicList.PageSize
 	offset := requestNsqTopicList.PageSize * max(requestNsqTopicList.Page-1, 0)
-	total := len(global.LBConsumerManager.Topics())
-	dataList := make([]string, total)
-	copy(dataList, global.LBConsumerManager.Topics())
+	dataList := global.LBConsumerManager.GetNamesByType(consumer.NSQConsumer.String())
+	total := len(dataList)
 	if requestNsqTopicList.Desc {
 		sort.Sort(sort.Reverse(sort.StringSlice(dataList)))
 	} else {

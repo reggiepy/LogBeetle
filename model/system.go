@@ -4,6 +4,7 @@ type SystemInfoResponse struct {
 	GoroutineNumber int          `json:"goroutine_number" form:"goroutineNumber"`
 	ConsumerInfo    ConsumerInfo `json:"consumer_info" form:"consumerInfo"`
 	StartTime       string       `json:"start_time" form:"start_time"`
+	Version         string       `json:"version" form:"version"`
 }
 
 type ConsumerInfo struct {

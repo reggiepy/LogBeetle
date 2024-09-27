@@ -3,6 +3,7 @@ package public
 import (
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/model"
+	"github.com/reggiepy/LogBeetle/version"
 	"runtime"
 )
 
@@ -16,6 +17,7 @@ func (s *ServiceSystem) SystemInfo() (error, model.SystemInfoResponse) {
 		},
 		StartTime:       global.StartTime,
 		GoroutineNumber: runtime.NumGoroutine(),
+		Version:         version.Full(),
 	}
 	return nil, ret
 }

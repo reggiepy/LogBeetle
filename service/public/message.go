@@ -5,13 +5,12 @@ import (
 	"time"
 
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/goutils/arrayUtils"
 )
 
 type ServiceMessage struct{}
 
 func (m *ServiceMessage) SendMessage(projectName string, message string) error {
-	if !arrayUtils.InArray(projectName, global.LBConsumerManager.Topics()) {
+	if !global.LBConsumerManager.ExistName(projectName){
 		return fmt.Errorf("topic【%s】 is not allowed\n", projectName)
 	}
 	start := time.Now()

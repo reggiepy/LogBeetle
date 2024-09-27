@@ -15,3 +15,15 @@ type SearchRequest struct {
 	User             string `json:"user" form:"user"`                           // 用户信息
 	LogLevel         string `json:"log_level" form:"loglevel"`                  // 日志级别
 }
+type AddLogRequest struct {
+	Id         string `json:"id,omitempty"`         // 从1开始递增
+	Text       string `json:"text,omitempty"`       // 【必须】日志内容，多行时仅为首行，直接显示用，是全文检索对象
+	Date       string `json:"date,omitempty"`       // 日期（格式YYYY-MM-DD HH:MM:SS.SSS）
+	System     string `json:"system,omitempty"`     // 系统名
+	ServerName string `json:"servername,omitempty"` // 服务器名
+	ServerIp   string `json:"serverip,omitempty"`   // 服务器IP
+	ClientIp   string `json:"clientip,omitempty"`   // 客户端IP
+	TraceId    string `json:"traceid,omitempty"`    // 跟踪ID
+	LogLevel   string `json:"loglevel,omitempty"`   // 日志级别（debug、info、warn、error）
+	User       string `json:"user,omitempty"`       // 用户
+}

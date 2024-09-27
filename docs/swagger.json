@@ -70,7 +70,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/logdata.LogDataModel"
+                            "$ref": "#/definitions/model.AddLogRequest"
                         }
                     }
                 ],
@@ -267,7 +267,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.SearchRequest"
+                            "$ref": "#/definitions/model.DeleteStoreRequest"
                         }
                     }
                 ],
@@ -363,7 +363,15 @@
         }
     },
     "definitions": {
-        "logdata.LogDataModel": {
+        "model.AboutResponse": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.AddLogRequest": {
             "type": "object",
             "properties": {
                 "clientip": {
@@ -372,10 +380,6 @@
                 },
                 "date": {
                     "description": "日期（格式YYYY-MM-DD HH:MM:SS.SSS）",
-                    "type": "string"
-                },
-                "detail": {
-                    "description": "【内部字段】多行时的详细日志信息，通常是包含错误堆栈等的日志内容",
                     "type": "string"
                 },
                 "id": {
@@ -392,10 +396,6 @@
                 },
                 "servername": {
                     "description": "服务器名",
-                    "type": "string"
-                },
-                "storename": {
-                    "description": "日志仓名称（未存储，仅赋值给前端使用）",
                     "type": "string"
                 },
                 "system": {
@@ -416,10 +416,10 @@
                 }
             }
         },
-        "model.AboutResponse": {
+        "model.DeleteStoreRequest": {
             "type": "object",
             "properties": {
-                "title": {
+                "store_name": {
                     "type": "string"
                 }
             }

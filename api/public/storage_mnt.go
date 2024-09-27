@@ -39,7 +39,7 @@ func (a *ApiStorageMnt) List(c *gin.Context) {
 // @Accept json
 // @Produce json
 //
-// @Param request body model.SearchRequest true "请求参数"
+// @Param request body model.DeleteStoreRequest true "请求参数"
 //
 // @Success      200  {object}   model.JSONResult
 // @router      /log-beetle/v1/store/delete   [post]
