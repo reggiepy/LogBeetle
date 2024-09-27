@@ -2,7 +2,6 @@ package nsq_consumer
 
 import (
 	"go.uber.org/zap"
-	"io"
 )
 
 type Options func(n *NSQLogConsumer) error
@@ -27,14 +26,6 @@ func WithName(name string) Options {
 func WithLogFileName(logFileName string) Options {
 	return func(n *NSQLogConsumer) error {
 		n.LogFileName = logFileName
-		return nil
-	}
-}
-
-// WithLogFile 设置NSQ消费者的日志文件
-func WithLogFile(logFile io.WriteCloser) Options {
-	return func(n *NSQLogConsumer) error {
-		n.LogFile = logFile
 		return nil
 	}
 }

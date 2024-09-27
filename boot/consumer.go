@@ -3,13 +3,14 @@ package boot
 import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/global"
+	"github.com/reggiepy/LogBeetle/goutils/signailUtils"
 	"github.com/reggiepy/LogBeetle/pkg/consumer/manager"
 	"github.com/reggiepy/LogBeetle/pkg/consumer/nsq_consumer"
 )
 
 func Consumer() {
 	// 获取配置
-	global.LBConsumerManager = &manager.Manager{}
+	global.LBConsumerManager = manager.NewManager()
 	nsqConfig := global.LbConfig.NSQConfig
 	consumerConfig := global.LbConfig.ConsumerConfig
 
@@ -28,15 +29,23 @@ func Consumer() {
 	if err != nil {
 		global.LbLogger.Fatal(fmt.Sprintf("error creating consumer %s: %v", "test", err))
 	} else {
-		global.LBConsumerManager.Add(c)
-		global.LbLogger.Info(fmt.Sprintf("consumer %s added to consumer manager", "test"))
+		err = global.LBConsumerManager.Add(c)
+		if err != nil {
+			global.LbLogger.Fatal(fmt.Sprintf("add consumer error: %v", err))
+		} else {
+			global.LbLogger.Info(fmt.Sprintf("consumer %s added to consumer manager", "test"))
+		}
 	}
 
 	// 添加其他消费者
 	for _, cfg := range consumerConfig.NSQConsumers {
-		var topic string
-		if cfg.Topic == "" {
+		var topic = cfg.Topic
+		if topic == "" {
 			topic = cfg.Name
+		}
+		if topic == "test" {
+			global.LbLogger.Warn("consumer topic can't be 'test'")
+			continue
 		}
 		c, err := nsq_consumer.NewNSQLogConsumer(
 			nsq_consumer.WithName(cfg.Name),
@@ -48,13 +57,17 @@ func Consumer() {
 		if err != nil {
 			global.LbLogger.Fatal(fmt.Sprintf("error creating consumer %s: %v", cfg.Topic, err))
 		} else {
-			global.LBConsumerManager.Add(c)
-			global.LbLogger.Info(fmt.Sprintf("consumer %s added to consumer manager", cfg.Name))
+			err = global.LBConsumerManager.Add(c)
+			if err != nil {
+				global.LbLogger.Fatal(fmt.Sprintf("add consumer error: %v", err))
+			} else {
+				global.LbLogger.Info(fmt.Sprintf("consumer %s added to consumer manager", "test"))
+			}
 		}
 	}
 
 	global.LBConsumerManager.Start()
-	global.OnExit(func() {
+	signailUtils.OnExit(func() {
 		global.LBConsumerManager.Stop()
 		global.LbLogger.Info("NSQ consumer stopped")
 	})

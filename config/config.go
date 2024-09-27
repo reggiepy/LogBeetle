@@ -12,13 +12,13 @@ type Config struct {
 	Search         Search         `yaml:"Search"`
 }
 type LogConfig struct {
-	LogFile    string `yaml:"LogFile"`    // 日志文件名
-	MaxSize    int    `yaml:"MaxSize"`    // 日志文件大小限制，单位为 MB
-	MaxBackups int    `yaml:"MaxBackups"` // 最大保留的旧日志文件数量
-	MaxAge     int    `yaml:"MaxAge"`     // 旧日志文件保留天数
-	Compress   bool   `yaml:"Compress"`   // 是否压缩旧日志文件
-	LogLevel   string `yaml:"LogLevel"`   // 日志等级
-	LogFormat  string `yaml:"LogFormat"`  // 日志等级
+	File       string `json:"File" yaml:"File"`             // 日志文件名
+	MaxSize    int    `json:"MaxSize" yaml:"MaxSize"`       // 日志文件大小限制（单位：MB）
+	MaxBackups int    `json:"MaxBackups" yaml:"MaxBackups"` // 最大保留的旧日志文件数量
+	MaxAge     int    `json:"MaxAge" yaml:"MaxAge"`         // 旧日志文件保留天数
+	Compress   bool   `json:"Compress" yaml:"Compress"`     // 是否压缩旧日志文件
+	Level      string `json:"LogLevel" yaml:"LogLevel"`     // 日志级别
+	Format     string `json:"LogFormat" yaml:"LogFormat"`   // 日志格式（如：json、logfmt）
 }
 type NSQConfig struct {
 	AuthSecret  string `yaml:"AuthSecret"`  // 权限
@@ -39,7 +39,6 @@ type Store struct {
 	Root                 string `yaml:"Root"`
 	ChanLength           int    `yaml:"ChanLength"`
 	AutoAddDate          bool   `yaml:"AutoAddDate"`
-	NameAutoAddDate bool   `yaml:"NameAutoAddDate"`
 	SaveDays             int    `yaml:"SaveDays"`
 	MaxIdleTime          int    `yaml:"MaxIdleTime"`
 	GoMaxProcessIdx      int    `yaml:"GoMaxProcessIdx"`

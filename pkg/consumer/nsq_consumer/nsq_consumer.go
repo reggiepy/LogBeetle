@@ -2,14 +2,11 @@ package nsq_consumer
 
 import (
 	"fmt"
-	"io"
+	"github.com/reggiepy/LogBeetle/goutils/logUtils/zapLogger"
+	"github.com/reggiepy/LogBeetle/pkg/consumer"
 	"path"
 	"sync"
 	"time"
-
-	"go.uber.org/multierr"
-
-	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/reggiepy/LogBeetle/global"
 
@@ -19,10 +16,11 @@ import (
 )
 
 type NSQLogConsumer struct {
-	Name        string
-	LogFileName string
-	LogFile     io.WriteCloser
-	Logger      *zap.Logger
+	Name string
+
+	LogFileName   string
+	LoggerCleanup func()
+	Logger        *zap.Logger
 
 	stopOnce  sync.Once
 	startOnce sync.Once
@@ -36,6 +34,14 @@ type NSQLogConsumer struct {
 	Handler       func(message []byte) error
 }
 
+func (c *NSQLogConsumer) GetName() string {
+	return c.Name
+}
+
+func (c *NSQLogConsumer) GetType() string {
+	return consumer.ChannelConsumer.String()
+}
+
 func (c *NSQLogConsumer) Stop() error {
 	var err error
 
@@ -46,27 +52,11 @@ func (c *NSQLogConsumer) Stop() error {
 			global.LbLogger.Info(fmt.Sprintf("closing consumer 【%s】 nsq", c.Name))
 		}
 
-		if c.LogFile != nil {
-			// 尝试同步日志
-			if syncErr := c.Logger.Sync(); syncErr != nil {
-				err = multierr.Append(err, fmt.Errorf("sync 【%s】 Logger failed: %v", c.Name, syncErr))
-			} else {
-				global.LbLogger.Info(fmt.Sprintf("sync consumer 【%s】 logger", c.Name))
-			}
-
-			// 尝试关闭日志文件
-			if closeErr := c.LogFile.Close(); closeErr != nil {
-				err = multierr.Append(err, fmt.Errorf("closing 【%s】 logfile failed: %v", c.Name, closeErr))
-			} else {
-				global.LbLogger.Info(fmt.Sprintf("closing consumer 【%s】 logger file", c.Name))
-			}
+		if c.Logger != nil {
+			c.LoggerCleanup()
 		}
 	})
 	return err
-}
-
-func (c *NSQLogConsumer) Topic() string {
-	return c.NSQTopic
 }
 
 // Start nsq consumer.
@@ -114,17 +104,11 @@ func (c *NSQLogConsumer) initializeNSQConsumer() error {
 func (c *NSQLogConsumer) initializeLogger() error {
 	consumerConfig := global.LbConfig.ConsumerConfig
 	filePath := path.Join(consumerConfig.LogPath, c.LogFileName)
-
-	lj := &lumberjack.Logger{
-		Filename:   filePath,
-		MaxSize:    1, // MB
-		MaxBackups: 5,
-		MaxAge:     30, // days
-		Compress:   false,
-	}
-	logger := NewZAPLogger(lj)
-	c.Logger = logger
-	c.LogFile = lj
+	logConfig := zapLogger.NewLoggerConfig(
+		zapLogger.WithFile(filePath),
+		zapLogger.WithInConsole(true),
+	)
+	c.Logger, c.LoggerCleanup = zapLogger.NewLogger(logConfig)
 	c.NSQConsumer.AddHandler(nsq.HandlerFunc(func(m *nsq.Message) error {
 		if len(m.Body) == 0 {
 			// Returning nil will automatically send a FIN command to NSQ to mark the message as processed.

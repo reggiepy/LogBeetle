@@ -15,13 +15,13 @@ func DefaultConfig() *Config {
 		Port:    1233,
 		LogPath: "logs",
 		LogConfig: LogConfig{
-			LogFile:    "./logs/log-beetle.log",
+			File:    "./logs/log-beetle.log",
 			MaxSize:    1,    // 单位为 MB
 			MaxBackups: 5,    // 最大保留的旧日志文件数量
 			MaxAge:     30,   // 旧日志文件保留天数
 			Compress:   true, // 是否压缩旧日志文件
-			LogLevel:   "info",
-			LogFormat:  "json",
+			Level:   "info",
+			Format:  "json",
 		},
 		ConsumerConfig: ConsumerConfig{
 			LogPath:      "./logs",
@@ -34,8 +34,7 @@ func DefaultConfig() *Config {
 		Store: Store{
 			Root:                 "/store",
 			ChanLength:           64,
-			AutoAddDate:          false,
-			NameAutoAddDate: true,
+			AutoAddDate:          true,
 			SaveDays:             180,
 			MaxIdleTime:          300,
 			GoMaxProcessIdx:      -1,

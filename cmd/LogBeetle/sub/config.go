@@ -2,27 +2,40 @@ package sub
 
 import (
 	"fmt"
+	"github.com/reggiepy/LogBeetle/goutils/enumUtils"
 	"os"
 
 	"github.com/reggiepy/LogBeetle/boot"
-	"github.com/reggiepy/LogBeetle/config"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/goutils/fileUtils"
 	"github.com/reggiepy/LogBeetle/goutils/jsonUtils"
 	"github.com/spf13/viper"
 
 	"github.com/spf13/cobra"
 )
 
+type ConfigConfig struct {
+	Format *enumUtils.Enum
+	Force  bool
+	Config string
+}
+
+var (
+	configConfig = ConfigConfig{
+		Format: enumUtils.NewEnum([]string{"humanReadable", "simple"}, "humanReadable"),
+	}
+)
+
 func init() {
-	rootCmd.AddCommand(configCmd)
-
-	// show config
+	configShowCmd.Flags().Var(configConfig.Format, "format", "humanReadable | simple")
+	configShowCmd.Flags().StringVarP(&configConfig.Config, "config", "c", "", "config file")
+	_ = viper.BindPFlag("config", configGenerateCmd.PersistentFlags().Lookup("config"))
 	configCmd.AddCommand(configShowCmd)
-	configShowCmd.Flags().Var(configFormat, "format", "humanReadable | simple")
 
-	// generate config
+	configGenerateCmd.Flags().BoolVarP(&configConfig.Force, "force", "f", false, "Generate configuration forces")
+	configGenerateCmd.Flags().StringVarP(&configConfig.Config, "config", "c", "", "config file")
+	_ = viper.BindPFlag("config", configGenerateCmd.PersistentFlags().Lookup("config"))
 	configCmd.AddCommand(configGenerateCmd)
+	rootCmd.AddCommand(configCmd)
 }
 
 var configCmd = &cobra.Command{
@@ -41,7 +54,7 @@ var configShowCmd = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		global.LbViper = boot.Viper()
-		data, err := jsonUtils.AnyToJson(global.LbConfig, configFormat.String())
+		data, err := jsonUtils.AnyToJson(global.LbConfig, configConfig.Format.String())
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
@@ -55,15 +68,15 @@ var configGenerateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "generate default config",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		configFile := viper.GetString("config")
-		if fileUtils.FileExists(configFile) {
-			return fmt.Errorf("config file already exists. please remove it before running this command")
-		}
-		defaultConfig := config.DefaultConfig()
-
-		err := config.SaveConfigToFile(defaultConfig, configFile)
-		if err != nil {
-			return err
+		global.LbViper = boot.Viper()
+		if !configConfig.Force {
+			if err := global.LbViper.SafeWriteConfig(); err != nil {
+				return err
+			}
+		} else {
+			if err := viper.WriteConfig(); err != nil {
+				return err
+			}
 		}
 		return nil
 	},

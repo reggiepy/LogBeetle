@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/boot"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/goutils/enumUtils"
+	"github.com/reggiepy/LogBeetle/goutils/jsonUtils"
 	"github.com/reggiepy/LogBeetle/ldb"
 	"github.com/reggiepy/LogBeetle/version"
 	"os"
@@ -13,15 +13,18 @@ import (
 	"github.com/spf13/viper"
 )
 
+type GlobalConfig struct {
+	ShowVersion bool
+}
+
 var (
-	showVersion  bool
-	configFormat = enumUtils.NewEnum([]string{"humanReadable", "simple"}, "humanReadable")
+	globalConfig = &GlobalConfig{}
 )
 
 func init() {
 	viper.SetDefault("config", "./log-beetle.yaml")
 	// 设置全局标志
-	rootCmd.PersistentFlags().BoolVarP(&showVersion, "version", "v", false, "show version information")
+	rootCmd.PersistentFlags().BoolVarP(&globalConfig.ShowVersion, "version", "v", false, "show version information")
 	rootCmd.PersistentFlags().StringP("config", "c", "", "config file")
 
 	// 添加命令行参数
@@ -46,12 +49,16 @@ var rootCmd = cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if showVersion {
+		if globalConfig.ShowVersion {
 			fmt.Println(version.Full())
 			return nil
 		}
 		global.LbViper = boot.Viper()
-		global.LbLogger = boot.Log()
+		data, err := jsonUtils.AnyToJson(global.LbConfig, "simple")
+		if err != nil {
+			fmt.Println("Config: ", data)
+		}
+		global.LbLogger, global.LbLoggerClearup = boot.Logger()
 		boot.NsqProducer()
 		boot.Ldb()
 		// 默认引擎空转一下，触发未建索引继续建

@@ -16,7 +16,7 @@ func Viper() *viper.Viper {
 	}
 	v := viper.New()
 	v.SetConfigFile(configFile)
-	v.AddConfigPath("./")
+	v.AddConfigPath(".")
 	v.SetEnvPrefix("LB") // 设置环境变量前缀
 	v.AutomaticEnv()
 
@@ -47,7 +47,7 @@ func SetupCombaConfig() {
 	logPath := viper.GetString("log_file")
 	// 如果日志文件路径不为空，则更新配置中的日志文件路径
 	if logPath != "" {
-		global.LbConfig.LogConfig.LogFile = logPath
+		global.LbConfig.LogConfig.File = logPath
 	}
 
 	// 从Viper获取消费者日志路径
