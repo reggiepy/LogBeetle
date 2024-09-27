@@ -9,10 +9,10 @@ func AnyToJson(data interface{}, format string) (string, error) {
 	var jsonData []byte
 	var err error
 	switch format {
-	case "simple":
+	case "simple", "s":
 		// 将结构体序列化为 JSON
 		jsonData, err = json.Marshal(data)
-	case "humanReadable":
+	case "humanReadable", "h":
 		// 将结构体序列化为 JSON
 		jsonData, err = json.MarshalIndent(data, "", "    ")
 	default:
