@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/com"
 	"github.com/reggiepy/LogBeetle/global"
+	"github.com/reggiepy/LogBeetle/goutils/signailUtils"
 	"github.com/reggiepy/LogBeetle/ldb/status"
 	"github.com/reggiepy/LogBeetle/ldb/storage/indexword"
 	"github.com/reggiepy/LogBeetle/ldb/sysmnt"
@@ -46,7 +47,7 @@ var mapStorageMu sync.Mutex
 
 func init() {
 	mapStorage = make(map[string](*LogDataStorage))
-	global.OnExit(onExit) // 优雅退出
+	signailUtils.OnExit(onExit) // 优雅退出
 }
 
 func getCacheStore(cacheName string) *LogDataStorage {

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/com"
 	"github.com/reggiepy/LogBeetle/global"
+	"github.com/reggiepy/LogBeetle/goutils/signailUtils"
 	"sort"
 	"sync"
 	"time"
@@ -32,7 +33,7 @@ var sdbMu sync.Mutex             // 锁
 var sysmntStorage *SysmntStorage // 缓存用存储器
 
 func init() {
-	global.OnExit(onExit) // 优雅退出
+	signailUtils.OnExit(onExit) // 优雅退出
 }
 
 // 获取存储对象，线程安全（带缓存无则创建有则直取）

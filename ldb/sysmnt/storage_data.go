@@ -28,7 +28,7 @@ type StorageModel struct {
 
 func init() {
 	go func() {
-		if global.LbConfig.Store.NameAutoAddDate && global.LbConfig.Store.SaveDays > 0 {
+		if global.LbConfig.Store.AutoAddDate && global.LbConfig.Store.SaveDays > 0 {
 			// removeStorageByDays() // 注释掉，没必要启动时就清理
 			ticker := time.NewTicker(time.Hour) // 一小时检查一次是否有待删除的日志仓
 			for {

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/com"
 	"github.com/reggiepy/LogBeetle/global"
+	"github.com/reggiepy/LogBeetle/goutils/signailUtils"
 	"github.com/reggiepy/LogBeetle/ldb/status"
 	"github.com/reggiepy/LogBeetle/ldb/storage/indexdoc"
 	"os"
@@ -39,7 +40,7 @@ var mapStorageMu sync.Mutex
 
 func init() {
 	mapStorage = make(map[string](*WordIndexStorage))
-	global.OnExit(onExit) // 优雅退出
+	signailUtils.OnExit(onExit) // 优雅退出
 }
 
 func getStorage(cacheName string) *WordIndexStorage {
