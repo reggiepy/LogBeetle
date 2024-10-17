@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/boot"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/goutils/jsonUtils"
 	"github.com/reggiepy/LogBeetle/ldb"
 	"github.com/reggiepy/LogBeetle/version"
 	"os"
@@ -54,10 +53,7 @@ var rootCmd = cobra.Command{
 			return nil
 		}
 		global.LbViper = boot.Viper()
-		data, err := jsonUtils.AnyToJson(global.LbConfig, "simple")
-		if err != nil {
-			fmt.Println("Config: ", data)
-		}
+		fmt.Println("Config: ", global.LbConfig.ToJson())
 		global.LbLogger, global.LbLoggerClearup = boot.Logger()
 		boot.NsqProducer()
 		boot.Ldb()

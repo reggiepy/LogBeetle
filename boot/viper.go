@@ -30,6 +30,7 @@ func Viper() *viper.Viper {
 	v.OnConfigChange(func(e fsnotify.Event) {
 		fmt.Println("Config file changed: ", e.String())
 		BindConfig(v)
+		fmt.Println("Config file changed: ", global.LbConfig.ToJson())
 	})
 	BindConfig(v)
 	SetupCombaConfig()
