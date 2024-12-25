@@ -15,13 +15,13 @@ func DefaultConfig() *Config {
 		Port:    1233,
 		LogPath: "logs",
 		LogConfig: LogConfig{
-			File:    "./logs/log-beetle.log",
-			MaxSize:    1,    // 单位为 MB
-			MaxBackups: 5,    // 最大保留的旧日志文件数量
-			MaxAge:     30,   // 旧日志文件保留天数
-			Compress:   true, // 是否压缩旧日志文件
-			Level:   "info",
-			Format:  "json",
+			File:       "./logs/log-beetle.log", // 默认日志文件位置
+			MaxSize:    5,                       // 最大日志文件大小限制为 5MB
+			MaxBackups: 3,                       // 保留最多 3 个旧日志
+			MaxAge:     7,                       // 旧日志文件保留 7 天
+			Compress:   true,                    // 启用日志压缩
+			Level:      "info",                  // 默认日志级别为 info
+			Format:     "json",                  // 默认日志格式为 JSON
 		},
 		ConsumerConfig: ConsumerConfig{
 			LogPath:      "./logs",
@@ -32,16 +32,16 @@ func DefaultConfig() *Config {
 			NSQDAddress: "127.0.0.1:4150",
 		},
 		Store: Store{
-			Root:                 "/store",
-			ChanLength:           64,
-			AutoAddDate:          true,
-			SaveDays:             180,
-			MaxIdleTime:          300,
-			GoMaxProcessIdx:      -1,
+			Root:            "/store",
+			ChanLength:      64,
+			AutoAddDate:     true,
+			SaveDays:        180,
+			MaxIdleTime:     300,
+			GoMaxProcessIdx: -1,
 		},
 		Search: Search{
-			PageSize: 100,
-			NearSearchSize: 200,
+			PageSize:        100,
+			NearSearchSize:  200,
 			MultiLineSearch: false,
 		},
 	}

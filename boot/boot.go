@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/goutils/signailUtils"
+	"github.com/reggiepy/LogBeetle/pkg/goutils/signailUtils"
 	"net/http"
 	"time"
 )

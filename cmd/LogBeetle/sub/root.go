@@ -5,7 +5,8 @@ import (
 	"github.com/reggiepy/LogBeetle/boot"
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/ldb"
-	"github.com/reggiepy/LogBeetle/version"
+	"github.com/reggiepy/LogBeetle/pkg/version"
+	"github.com/reggiepy/LogBeetle/pkg/goutils/signailUtils"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -21,7 +22,7 @@ var (
 )
 
 func init() {
-	viper.SetDefault("config", "./log-beetle.yaml")
+	cobra.OnInitialize(initConfig)
 	// 设置全局标志
 	rootCmd.PersistentFlags().BoolVarP(&globalConfig.ShowVersion, "version", "v", false, "show version information")
 	rootCmd.PersistentFlags().StringP("config", "c", "", "config file")
@@ -52,9 +53,7 @@ var rootCmd = cobra.Command{
 			fmt.Println(version.Full())
 			return nil
 		}
-		global.LbViper = boot.Viper()
-		fmt.Println("Config: ", global.LbConfig.ToJson())
-		global.LbLogger, global.LbLoggerClearup = boot.Logger()
+
 		boot.NsqProducer()
 		boot.Ldb()
 		// 默认引擎空转一下，触发未建索引继续建
@@ -69,4 +68,13 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func initConfig() {
+	global.LbViper = boot.Viper()
+	fmt.Println("Config: ", global.LbConfig.ToJson())
+	global.LbLogger, global.LbLoggerClearup = boot.Logger()
+	signailUtils.OnExit(func() {
+		global.LbLoggerClearup() // 确保在程序退出时刷新日志缓冲区
+	})
 }

@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/com"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/goutils/signailUtils"
+	"github.com/reggiepy/LogBeetle/pkg/goutils/signailUtils"
 	"sort"
 	"sync"
 	"time"

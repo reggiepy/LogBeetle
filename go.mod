@@ -14,19 +14,18 @@ require (
 	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.3
 	github.com/syndtr/goleveldb v1.0.0
-	go.uber.org/multierr v1.10.0
 	go.uber.org/zap v1.27.0
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	github.com/BurntSushi/toml v1.3.2 // indirect
+	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
 	github.com/bytedance/sonic v1.11.3 // indirect
@@ -69,6 +68,7 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/arch v0.7.0 // indirect
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
@@ -78,5 +78,5 @@ require (
 	golang.org/x/tools v0.19.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )

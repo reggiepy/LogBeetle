@@ -2,12 +2,12 @@ package sub
 
 import (
 	"fmt"
-	"github.com/reggiepy/LogBeetle/goutils/enumUtils"
+	"github.com/reggiepy/LogBeetle/pkg/goutils/enumUtils"
 	"os"
 
 	"github.com/reggiepy/LogBeetle/boot"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/goutils/jsonUtils"
+	"github.com/reggiepy/LogBeetle/pkg/goutils/jsonUtils"
 	"github.com/spf13/viper"
 
 	"github.com/spf13/cobra"
