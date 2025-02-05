@@ -33,7 +33,7 @@ func Boot() {
 		global.LbLoggerClearup() // 确保在程序退出时刷新日志缓冲区
 	})
 
-	signailUtils.WaitExit(1*time.Second)
+	signailUtils.WaitExit(1 * time.Second)
 }
 
 func logo(addr string) {

@@ -10,7 +10,6 @@ func Test_CutWords(t *testing.T) {
 	fmt.Println(ws)
 }
 
-
 func Test_CutWords2(t *testing.T) {
 	ws := CutForSearch("2024-08-28 13:59:04,797 -- INFO  -- 【76】 【903b234c90f4461294d49a7090858158】 【76--903b234c90f4461294d49a7090858158】退出计算 (inner_wrapper in new_runService.py):45]")
 	fmt.Println(ws)

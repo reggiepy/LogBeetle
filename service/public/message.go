@@ -10,7 +10,7 @@ import (
 type ServiceMessage struct{}
 
 func (m *ServiceMessage) SendMessage(projectName string, message string) error {
-	if !global.LBConsumerManager.ExistName(projectName){
+	if !global.LBConsumerManager.ExistName(projectName) {
 		return fmt.Errorf("topic【%s】 is not allowed\n", projectName)
 	}
 	start := time.Now()

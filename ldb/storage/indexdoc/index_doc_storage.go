@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/com"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/signailUtils"
 	"github.com/reggiepy/LogBeetle/ldb/status"
+	"github.com/reggiepy/LogBeetle/pkg/goutils/signailUtils"
 	"sync"
 	"time"
 
@@ -150,7 +150,7 @@ func (s *DocIndexStorage) Close() {
 	defer idxMu.Unlock()          // map解锁
 	mapStorage[s.storeName] = nil // 设空，下回GetStorage时自动再创建
 
-	global.LbLogger.Info(fmt.Sprintf("关闭DocIndexStorage：%s", s.storeName + com.PathSeparator() + s.subPath))
+	global.LbLogger.Info(fmt.Sprintf("关闭DocIndexStorage：%s", s.storeName+com.PathSeparator()+s.subPath))
 }
 
 // 存储目录名

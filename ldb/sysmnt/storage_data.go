@@ -47,7 +47,7 @@ func GetStorageList() *StorageResult {
 	names := com.GetStorageNames(global.LbConfig.Store.Root, ".sysmnt")
 	for _, name := range names {
 		d := &StorageModel{
-			Name:    name,
+			Name: name,
 		}
 
 		cnt, size, _ := com.GetDirInfo(global.LbConfig.Store.Root + com.PathSeparator() + name)

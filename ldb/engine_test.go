@@ -25,7 +25,6 @@ func TestEngine(t *testing.T) {
 	engine.AddLogDataModel(data)
 }
 
-
 func TestEngineTotalCount(t *testing.T) {
 	engine := NewDefaultEngine()
 	engine.Search()

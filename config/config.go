@@ -1,10 +1,5 @@
 package config
 
-import (
-	"encoding/json"
-	"gopkg.in/yaml.v3"
-)
-
 type Config struct {
 	Env            string         `json:"env" yaml:"Env"`          // 环境：prod、dev
 	BaseUrl        string         `json:"base_url" yaml:"BaseUrl"` // base url
@@ -56,35 +51,4 @@ type Search struct {
 	PageSize        int  `json:"page_size" yaml:"PageSize"`
 	NearSearchSize  int  `json:"near_search_size" yaml:"NearSearchSize"`
 	MultiLineSearch bool `json:"multi_line_search" yaml:"MultiLineSearch"`
-}
-
-// ToJson 将配置转换为JSON格式
-func (c *Config) ToJson() string {
-	jsonData, _ := json.MarshalIndent(c, "", "  ")
-	return string(jsonData)
-}
-
-// LoadJson 从JSON文件加载配置
-func (c *Config) LoadJson(data string) error {
-	if err := json.Unmarshal([]byte(data), c); err != nil {
-		return err
-	}
-	return nil
-}
-
-// ToYaml 将配置转换为YAML格式
-func (c *Config) ToYaml() (string, error) {
-	yamlData, err := yaml.Marshal(c)
-	if err != nil {
-		return "", err
-	}
-	return string(yamlData), nil
-}
-
-// LoadYaml 从YAML文件加载配置
-func (c *Config) LoadYaml(data string) error {
-	if err := yaml.Unmarshal([]byte(data), c); err != nil {
-		return err
-	}
-	return nil
 }

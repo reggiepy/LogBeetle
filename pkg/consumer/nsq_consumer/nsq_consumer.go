@@ -2,8 +2,8 @@ package nsq_consumer
 
 import (
 	"fmt"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/logUtils/zapLogger"
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
+	"github.com/reggiepy/LogBeetle/pkg/goutils/logutil/zapLogger"
 	"path"
 	"sync"
 	"time"

@@ -3,6 +3,7 @@ package boot
 import (
 	"errors"
 	"fmt"
+	"github.com/gookit/goutil/jsonutil"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/reggiepy/LogBeetle/global"
@@ -30,7 +31,8 @@ func Viper() *viper.Viper {
 	v.OnConfigChange(func(e fsnotify.Event) {
 		fmt.Println("Config file changed: ", e.String())
 		BindConfig(v)
-		fmt.Println("Config file changed: ", global.LbConfig.ToJson())
+		configString, _ := jsonutil.EncodeString(global.LbConfig)
+		fmt.Println("Config file changed: ", configString)
 	})
 	BindConfig(v)
 	SetupCombaConfig()

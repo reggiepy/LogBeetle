@@ -3,9 +3,9 @@ package boot
 import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/signailUtils"
 	"github.com/reggiepy/LogBeetle/pkg/consumer/manager"
 	"github.com/reggiepy/LogBeetle/pkg/consumer/nsq_consumer"
+	"github.com/reggiepy/LogBeetle/pkg/goutils/signailUtils"
 )
 
 func Consumer() {

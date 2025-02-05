@@ -2,13 +2,15 @@ package sub
 
 import (
 	"fmt"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/enumUtils"
-	"os"
-
+	"github.com/gookit/goutil/fsutil"
+	"github.com/gookit/goutil/jsonutil"
 	"github.com/reggiepy/LogBeetle/boot"
+	"github.com/reggiepy/LogBeetle/config"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/jsonUtils"
+	"github.com/reggiepy/LogBeetle/pkg/goutils/enumUtils"
+	"github.com/reggiepy/LogBeetle/pkg/goutils/yamlutil"
 	"github.com/spf13/viper"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -50,14 +52,19 @@ var configShowCmd = &cobra.Command{
 	Use:   "show",
 	Short: "show config",
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"json", "simple"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{"humanReadable", "simple"}, cobra.ShellCompDirectiveNoFileComp
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		global.LbViper = boot.Viper()
-		data, err := jsonUtils.AnyToJson(global.LbConfig, configConfig.Format.String())
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
+		configFormat := configConfig.Format.String()
+
+		var data string
+		switch configFormat {
+		case "humanReadable":
+			data, _ = jsonutil.EncodeString(global.LbConfig)
+		case "simple":
+			dataBytes, _ := jsonutil.Encode(global.LbConfig)
+			data = string(dataBytes)
 		}
 		fmt.Println(data)
 		return nil
@@ -68,15 +75,31 @@ var configGenerateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "generate default config",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		global.LbViper = boot.Viper()
+		var err error
+		configFile := viper.GetString("config")
+		if configFile == "" {
+			return fmt.Errorf("config file not specified")
+		}
+
+		configFileExt := fsutil.Extname(configFile)
+
+		defaultConfig := config.DefaultConfig()
+		configString := ""
+		switch configFileExt {
+		case "yaml":
+			configString, _ = yamlutil.EncodeString(defaultConfig)
+		case "json":
+			configString, _ = jsonutil.EncodeString(defaultConfig)
+		default:
+			return fmt.Errorf("unsupported config file extension: %s", configFileExt)
+		}
+		flags := os.O_CREATE | os.O_TRUNC | os.O_WRONLY
 		if !configConfig.Force {
-			if err := global.LbViper.SafeWriteConfig(); err != nil {
-				return err
-			}
-		} else {
-			if err := viper.WriteConfig(); err != nil {
-				return err
-			}
+			flags |= os.O_EXCL
+		}
+		err = fsutil.WriteFile(configFile, configString, os.ModePerm, flags)
+		if err != nil {
+			return fmt.Errorf("write config to file failed: %v", err)
 		}
 		return nil
 	},

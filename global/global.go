@@ -19,5 +19,4 @@ var (
 	// NSQ
 	LbNsqProducer     *nsq.Producer
 	LBConsumerManager *manager.Manager
-
 )
