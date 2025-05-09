@@ -2,7 +2,7 @@ Env: prod # 环境，线上环境：prod、测试环境：dev
 BaseUrl: "http://127.0.0.1:1233" # 网站域名
 Port: 1233 # 端口
 LogConfig: # 日志配置
-  LogFile: ./logs/log-beetle.log # 日志文件名
+  File: ./logs/log-beetle.log # 日志文件名
   MaxSize: 1 # 日志文件大小限制，单位为 MB
   MaxBackups: 5 # 最大保留的旧日志文件数量
   MaxAge: 30 # 旧日志文件保留天数
@@ -18,7 +18,7 @@ ConsumerConfig:
 
 NSQConfig:
   AuthSecret: ""
-  NSQDAddress: ""
+  NSQDAddress: "127.0.0.1:4150"
 Store:
   Root: ./store
   ChanLength: 64

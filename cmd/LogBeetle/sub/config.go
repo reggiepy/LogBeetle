@@ -15,26 +15,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type ConfigConfig struct {
-	Format *enumUtils.Enum
-	Force  bool
-	Config string
-}
-
 var (
-	configConfig = ConfigConfig{
-		Format: enumUtils.NewEnum([]string{"humanReadable", "simple"}, "humanReadable"),
-	}
+	format  *enumUtils.Enum = enumUtils.NewEnum([]string{"humanReadable", "simple"}, "humanReadable")
+	force   bool
+	cfgFile string
 )
 
 func init() {
-	configShowCmd.Flags().Var(configConfig.Format, "format", "humanReadable | simple")
-	configShowCmd.Flags().StringVarP(&configConfig.Config, "config", "c", "", "config file")
+	configShowCmd.Flags().Var(format, "format", "humanReadable | simple")
+	configShowCmd.Flags().StringVarP(&cfgFile, "config", "c", "", "config file")
 	_ = viper.BindPFlag("config", configGenerateCmd.PersistentFlags().Lookup("config"))
 	configCmd.AddCommand(configShowCmd)
 
-	configGenerateCmd.Flags().BoolVarP(&configConfig.Force, "force", "f", false, "Generate configuration forces")
-	configGenerateCmd.Flags().StringVarP(&configConfig.Config, "config", "c", "", "config file")
+	configGenerateCmd.Flags().BoolVarP(&force, "force", "f", false, "Generate configuration forces")
+	configGenerateCmd.Flags().StringVarP(&cfgFile, "config", "c", "", "config file")
 	_ = viper.BindPFlag("config", configGenerateCmd.PersistentFlags().Lookup("config"))
 	configCmd.AddCommand(configGenerateCmd)
 	rootCmd.AddCommand(configCmd)
@@ -56,7 +50,7 @@ var configShowCmd = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		global.LbViper = boot.Viper()
-		configFormat := configConfig.Format.String()
+		configFormat := format.String()
 
 		var data string
 		switch configFormat {
@@ -94,7 +88,7 @@ var configGenerateCmd = &cobra.Command{
 			return fmt.Errorf("unsupported config file extension: %s", configFileExt)
 		}
 		flags := os.O_CREATE | os.O_TRUNC | os.O_WRONLY
-		if !configConfig.Force {
+		if !force {
 			flags |= os.O_EXCL
 		}
 		err = fsutil.WriteFile(configFile, configString, os.ModePerm, flags)

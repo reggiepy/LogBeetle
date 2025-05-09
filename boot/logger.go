@@ -11,6 +11,7 @@ import (
 func Logger() (*zap.Logger, func()) {
 	logConfig := zapLogger.NewLoggerConfig(
 		zapLogger.WithInConsole(true),
+		zapLogger.WithReplaceGlobals(true),
 	)
 	jsonBytes, _ := json.Marshal(global.LbConfig.LogConfig)
 	err := logConfig.LoadJSON(string(jsonBytes))

@@ -52,7 +52,7 @@ func SetDefaults(config *Config) {
 	SetStructDefaults(config, defaultConfig)
 }
 
-// setStructDefaults 从默认配置中复制非零值字段到目标配置中
+// SetStructDefaults 从默认配置中复制非零值字段到目标配置中
 // 如果目标配置中的字段是切片类型，则递归处理每个元素
 // 如果目标配置中的字段是结构体类型，则递归调用该方法处理嵌套结构体
 // 如果目标配置中的字段是零值，则使用默认配置中对应字段的值进行填充

@@ -8,9 +8,12 @@ import (
 	"github.com/reggiepy/LogBeetle/pkg/goutils/signailUtils"
 )
 
-func Consumer() {
+func Consumer() *manager.Manager {
 	// 获取配置
-	global.LBConsumerManager = manager.NewManager()
+	consumerManager, err := manager.NewManager(manager.WithLogger(global.LbLogger))
+	if err != nil {
+		panic(err)
+	}
 	nsqConfig := global.LbConfig.NSQConfig
 	consumerConfig := global.LbConfig.ConsumerConfig
 
@@ -29,7 +32,7 @@ func Consumer() {
 	if err != nil {
 		global.LbLogger.Fatal(fmt.Sprintf("error creating consumer %s: %v", "test", err))
 	} else {
-		err = global.LBConsumerManager.Add(c)
+		err = consumerManager.Add(c)
 		if err != nil {
 			global.LbLogger.Fatal(fmt.Sprintf("add consumer error: %v", err))
 		} else {
@@ -57,7 +60,7 @@ func Consumer() {
 		if err != nil {
 			global.LbLogger.Fatal(fmt.Sprintf("error creating consumer %s: %v", cfg.Topic, err))
 		} else {
-			err = global.LBConsumerManager.Add(c)
+			err = consumerManager.Add(c)
 			if err != nil {
 				global.LbLogger.Fatal(fmt.Sprintf("add consumer error: %v", err))
 			} else {
@@ -66,9 +69,10 @@ func Consumer() {
 		}
 	}
 
-	global.LBConsumerManager.Start()
+	consumerManager.Start()
 	signailUtils.OnExit(func() {
-		global.LBConsumerManager.Stop()
+		consumerManager.Stop()
 		global.LbLogger.Info("NSQ consumer stopped")
 	})
+	return consumerManager
 }
