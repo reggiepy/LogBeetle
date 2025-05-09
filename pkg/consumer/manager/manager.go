@@ -3,6 +3,7 @@ package manager
 import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
+	"go.uber.org/zap"
 	"sync"
 )
 
@@ -10,15 +11,24 @@ import (
 type Manager struct {
 	consumers map[string]consumer.Consumer
 	mux       sync.Mutex
-	cnt       int
+	logger    *zap.Logger
 }
 
 // NewManager 创建一个新的 Manager 实例
-func NewManager() *Manager {
-	return &Manager{
+func NewManager(opts ...Options) (*Manager, error) {
+	m := &Manager{
 		consumers: make(map[string]consumer.Consumer), // 初始化消费者映射
-		cnt:       0,                                  // 初始化计数器
 	}
+	for _, opt := range opts {
+		err := opt(m)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if m.logger == nil {
+		return nil, fmt.Errorf("no logger provided")
+	}
+	return m, nil
 }
 
 // Start 启动所有消费者
@@ -30,9 +40,9 @@ func (m *Manager) Start() {
 	for name, c := range m.consumers {
 		err := c.Start()
 		if err != nil {
-			fmt.Printf("%s consumer start error: %v\n", name, err)
+			m.logger.Info(fmt.Sprintf("%s consumer start error: %v\n", name, err))
 		} else {
-			fmt.Printf("%s consumer start success\n", name)
+			m.logger.Info(fmt.Sprintf("%s consumer start success\n", name))
 		}
 	}
 }
@@ -46,9 +56,9 @@ func (m *Manager) Stop() {
 	for name, c := range m.consumers {
 		err := c.Stop()
 		if err != nil {
-			fmt.Printf("%s consumer stop error: %v\n", name, err)
+			m.logger.Info(fmt.Sprintf("%s consumer stop error: %v\n", name, err))
 		} else {
-			fmt.Printf("%s consumer stop success\n", name)
+			m.logger.Info(fmt.Sprintf("%s consumer stop success\n", name))
 		}
 	}
 }
@@ -66,17 +76,16 @@ func (m *Manager) Add(c consumer.Consumer) error {
 
 	// 添加新的消费者，并增加计数
 	m.consumers[c.GetName()] = c
-	m.cnt++
 
 	return nil
 }
 
-// Count 返回当前消费者的数量
-func (m *Manager) Count() int {
+// ConsumerCount 返回当前消费者的数量
+func (m *Manager) ConsumerCount() int {
 	m.mux.Lock()
 	defer m.mux.Unlock()
 
-	return m.cnt
+	return len(m.consumers)
 }
 
 // Delete 从 Manager 中删除指定名称的消费者
@@ -86,7 +95,6 @@ func (m *Manager) Delete(name string) {
 
 	if _, exists := m.consumers[name]; exists {
 		delete(m.consumers, name)
-		m.cnt-- // 减少计数
 	}
 }
 

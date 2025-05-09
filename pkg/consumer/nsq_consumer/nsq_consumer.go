@@ -128,7 +128,7 @@ func NewNSQLogConsumer(opts ...Options) (*NSQLogConsumer, error) {
 	for _, opt := range opts {
 		err := opt(c)
 		if err != nil {
-			panic(err.(any))
+			panic(err)
 		}
 	}
 	status, err := structUtils.IsEmptyStringField(c, "NSQTopic", "NSQAddress", "LogFileName", "Name")
