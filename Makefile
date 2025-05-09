@@ -6,6 +6,10 @@ all: fmt build
 
 build: LogBeetle
 
+LogBeetle:
+	env CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" -o bin/LogBeetle ./cmd/LogBeetle
+
+
 # compile assets into binary file
 file:
 	rm -rf ./assets/frps/static/*
@@ -23,7 +27,7 @@ vet:
 	go vet ./...
 
 LogBeetle:
-	env CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" github.com/reggiepy/LogBeetle/cmd/LogBeetle
+	env CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" ./cmd/LogBeetle
 
 test: gotest
 
