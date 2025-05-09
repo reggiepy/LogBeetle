@@ -3,8 +3,6 @@ package boot
 import (
 	"errors"
 	"fmt"
-	"github.com/gookit/goutil/jsonutil"
-
 	"github.com/fsnotify/fsnotify"
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/spf13/viper"
@@ -12,12 +10,14 @@ import (
 
 func Viper() *viper.Viper {
 	configFile := viper.GetString("config")
-	if configFile == "" {
-		configFile = "log-beetle.yaml"
-	}
 	v := viper.New()
-	v.SetConfigFile(configFile)
-	v.AddConfigPath(".")
+	if configFile == "" {
+		v.SetConfigName("config") // 不带扩展名
+		v.SetConfigType("yaml")   // 指定文件类型
+		v.AddConfigPath(".")      // 当前目录查找
+	} else {
+		v.SetConfigFile(configFile) // 传入完整路径，如 "./config.yaml"
+	}
 	v.SetEnvPrefix("LB") // 设置环境变量前缀
 	v.AutomaticEnv()
 
@@ -29,10 +29,10 @@ func Viper() *viper.Viper {
 	}
 	v.WatchConfig()
 	v.OnConfigChange(func(e fsnotify.Event) {
-		fmt.Println("Config file changed: ", e.String())
+		//fmt.Println("Config file changed: ", e.String())
 		BindConfig(v)
-		configString, _ := jsonutil.EncodeString(global.LbConfig)
-		fmt.Println("Config file changed: ", configString)
+		//configString, _ := jsonutil.EncodeString(global.LbConfig)
+		//fmt.Println("Config file changed: ", configString)
 	})
 	BindConfig(v)
 	SetupCombaConfig()
