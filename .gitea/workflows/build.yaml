@@ -1,10 +1,10 @@
-name: Build LogBeetle (Linux)
-run-name: ${{ gitea.actor }} is Build Linux Actions 🚀
+name: Build LogBeetle Windows Binary
+run-name: ${{ gitea.actor }} is Build Windows Actions 🚀
 
 on: [push]
 
 jobs:
-  build-linux:
+  build-windows:
     runs-on: ubuntu-latest
     env:
       http_proxy: "http://${{ secrets.proxy }}/"
@@ -32,16 +32,9 @@ jobs:
       - name: Install dependencies
         run: go mod tidy
 
-      - name: Build LogBeetle (Linux)
+      - name: Build LogBeetle (Windows)
         run: |
-          export CGO_ENABLED=0
-          go build -ldflags="-s -w" -o LogBeetle ./cmd/LogBeetle
-          if [ $? -ne 0 ]; then
-            echo "Go build failed!"
-            exit 1
-          else
-            echo "Go build succeeded!"
-          fi
+          package.sh
 
       - name: Install MinIO Client
         run: |
@@ -55,4 +48,4 @@ jobs:
 
       - name: Upload binary to MinIO
         run: |
-          mc cp LogBeetle.exe minio/releases/LogBeetle/linux/LogBeetle
+          mc cp ./bin minio/releases/LogBeetle/
