@@ -7,8 +7,8 @@ import (
 	"github.com/reggiepy/LogBeetle/boot"
 	"github.com/reggiepy/LogBeetle/config"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/enumUtils"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/yamlutil"
+	"github.com/reggiepy/goutils/enumUtils"
+	"github.com/reggiepy/goutils/yamlutil"
 	"github.com/spf13/viper"
 	"os"
 

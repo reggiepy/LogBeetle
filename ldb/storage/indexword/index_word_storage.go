@@ -11,7 +11,7 @@ import (
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/ldb/status"
 	"github.com/reggiepy/LogBeetle/ldb/storage/indexdoc"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/signailUtils"
+	"github.com/reggiepy/goutils/signailUtils"
 	"os"
 	"sync"
 	"time"

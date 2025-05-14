@@ -15,8 +15,14 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.21
+        env:
+          GOPROXY: https://goproxy.cn
+          GO111MODULE: on
 
-      - name: Build LogBeetle
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Build LogBeetle (Linux)
         run: |
           export CGO_ENABLED=0
           go build -ldflags="-s -w" -o LogBeetle ./cmd/LogBeetle

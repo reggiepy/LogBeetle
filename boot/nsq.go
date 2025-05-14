@@ -5,7 +5,7 @@ import (
 	"github.com/nsqio/go-nsq"
 	"github.com/reggiepy/LogBeetle/config"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/signailUtils"
+	"github.com/reggiepy/goutils/signailUtils"
 )
 
 func NsqProducer(nsqConfig config.NSQConfig) *nsq.Producer {

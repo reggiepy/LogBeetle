@@ -15,7 +15,7 @@ import (
 	"github.com/reggiepy/LogBeetle/ldb/storage/indexword"
 	"github.com/reggiepy/LogBeetle/ldb/sysmnt"
 	"github.com/reggiepy/LogBeetle/ldb/tokenizer"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/signailUtils"
+	"github.com/reggiepy/goutils/signailUtils"
 	"sync"
 	"time"
 

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/logutil/zapLogger"
+	"github.com/reggiepy/goutils/logutil/zapLogger"
 	"go.uber.org/zap"
 )
 

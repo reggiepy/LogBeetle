@@ -3,7 +3,7 @@ package nsq_consumer
 import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/pkg/consumer"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/logutil/zapLogger"
+	"github.com/reggiepy/goutils/logutil/zapLogger"
 	"path"
 	"sync"
 	"time"
@@ -11,7 +11,7 @@ import (
 	"github.com/reggiepy/LogBeetle/global"
 
 	"github.com/nsqio/go-nsq"
-	"github.com/reggiepy/LogBeetle/pkg/goutils/structUtils"
+	"github.com/reggiepy/goutils/structUtils"
 	"go.uber.org/zap"
 )
 
