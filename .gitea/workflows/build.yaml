@@ -30,7 +30,6 @@ jobs:
       - name: Build LogBeetle (Windows)
         run: |
           echo `pwd`
-          echo `ls -alh`
           bash package.sh
 
       - name: Install MinIO Client
@@ -45,4 +44,4 @@ jobs:
 
       - name: Upload binary to MinIO
         run: |
-          mc cp ./bin minio/releases/LogBeetle/
+          mc cp --recursive ./bin minio/releases/LogBeetle/
