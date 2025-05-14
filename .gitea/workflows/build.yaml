@@ -19,6 +19,11 @@ jobs:
           GOPROXY: https://goproxy.cn
           GO111MODULE: on
 
+      - name: verify proxy
+        run: |
+          echo $HTTP_PROXY
+          echo $HTTPS_PROXY
+
       - name: Install dependencies
         run: go mod tidy
 
