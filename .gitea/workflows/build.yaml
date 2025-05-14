@@ -6,11 +6,6 @@ on: [push]
 jobs:
   build-windows:
     runs-on: ubuntu-latest
-    env:
-      http_proxy: "http://${{ secrets.proxy }}/"
-      https_proxy: "http://${{ secrets.proxy }}/"
-      ftp_proxy: "${{ secrets.proxy }}"
-      no_proxy: "localhost, 127.0.0.1, ::1"
 
     steps:
       - name: verify proxy
