@@ -29,7 +29,9 @@ jobs:
 
       - name: Build LogBeetle (Windows)
         run: |
-          package.sh
+          echo `pwd`
+          echo `ls -alh`
+          bash package.sh
 
       - name: Install MinIO Client
         run: |
