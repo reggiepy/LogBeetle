@@ -6,8 +6,18 @@ on: [push]
 jobs:
   build-linux:
     runs-on: ubuntu-latest
+    env:
+      http_proxy: "http://${{ secrets.proxy }}/"
+      https_proxy: "http://${{ secrets.proxy }}/"
+      ftp_proxy: "${{ secrets.proxy }}"
+      no_proxy: "localhost, 127.0.0.1, ::1"
 
     steps:
+      - name: verify proxy
+        run: |
+          echo $http_proxy
+          echo $https_proxy
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -19,11 +29,6 @@ jobs:
           GOPROXY: https://goproxy.cn
           GO111MODULE: on
 
-      - name: verify proxy
-        run: |
-          echo $HTTP_PROXY
-          echo $HTTPS_PROXY
-
       - name: Install dependencies
         run: go mod tidy
 
@@ -31,6 +36,12 @@ jobs:
         run: |
           export CGO_ENABLED=0
           go build -ldflags="-s -w" -o LogBeetle ./cmd/LogBeetle
+          if [ $? -ne 0 ]; then
+            echo "Go build failed!"
+            exit 1
+          else
+            echo "Go build succeeded!"
+          fi
 
       - name: Install MinIO Client
         run: |
