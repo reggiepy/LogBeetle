@@ -27,8 +27,16 @@ jobs:
           export CGO_ENABLED=0
           go build -ldflags="-s -w" -o LogBeetle ./cmd/LogBeetle
 
-      - name: Archive binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: logbeetle-linux
-          path: LogBeetle
+      - name: Install MinIO Client
+        run: |
+          curl -O https://dl.min.io/client/mc/release/linux-amd64/mc
+          chmod +x mc
+          sudo mv mc /usr/local/bin/mc
+
+      - name: Configure MinIO Client
+        run: |
+          mc alias set minio ${{ secrets.MINIO_ENDPOINT }} ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
+
+      - name: Upload binary to MinIO
+        run: |
+          mc cp LogBeetle.exe minio/releases/LogBeetle/linux/LogBeetle
