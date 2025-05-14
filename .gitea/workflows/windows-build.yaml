@@ -4,15 +4,15 @@ run-name: ${{ gitea.actor }} is Build Windows Actions 🚀
 on: [push]
 
 jobs:
-  build:
-    runs-on: ubuntu-20.04
+  build-windows:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: gitea-actions/checkout@v3
+        uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: gitea-actions/setup-go@v3
+        uses: actions/setup-go@v3
         with:
           go-version: 1.21
 
@@ -24,7 +24,7 @@ jobs:
           go build -ldflags="-s -w" -o LogBeetle.exe ./cmd/LogBeetle
 
       - name: Archive artifact
-        uses: gitea-actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3
         with:
           name: LogBeetle-windows
           path: LogBeetle.exe

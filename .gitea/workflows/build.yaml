@@ -4,8 +4,8 @@ run-name: ${{ gitea.actor }} is Build Linux Actions 🚀
 on: [push]
 
 jobs:
-  build:
-    runs-on: ubuntu-20.04
+  build-linux:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
