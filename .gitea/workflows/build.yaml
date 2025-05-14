@@ -1,4 +1,5 @@
 name: Build LogBeetle (Linux)
+run-name: ${{ gitea.actor }} is Build Linux Actions 🚀
 
 on:
   push:
