@@ -1,9 +1,7 @@
 name: Build LogBeetle (Linux)
 run-name: ${{ gitea.actor }} is Build Linux Actions 🚀
 
-on:
-  push:
-    branches: [ main ]
+on: [push]
 
 jobs:
   Explore-Gitea-Actions:
