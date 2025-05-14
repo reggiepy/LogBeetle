@@ -1,0 +1,29 @@
+name: Build LogBeetle (Linux)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: https://gitea.com/actions/checkout@v3
+
+      - name: Set up Go
+        uses: https://gitea.com/actions/setup-go@v1
+        with:
+          go-version: 1.21
+
+      - name: Build LogBeetle
+        run: |
+          export CGO_ENABLED=0
+          go build -ldflags="-s -w" -o LogBeetle ./cmd/LogBeetle
+
+      - name: Archive binary
+        uses: https://gitea.com/actions/upload-artifact@v3
+        with:
+          name: logbeetle-linux
+          path: LogBeetle
