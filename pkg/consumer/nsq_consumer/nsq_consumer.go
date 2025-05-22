@@ -106,7 +106,8 @@ func (c *NSQLogConsumer) initializeLogger() error {
 	filePath := path.Join(consumerConfig.LogPath, c.LogFileName)
 	logConfig := zapLogger.NewLoggerConfig(
 		zapLogger.WithFile(filePath),
-		zapLogger.WithInConsole(true),
+		zapLogger.WithLogFormat("logfmt"),
+		//zapLogger.WithInConsole(true),
 	)
 	c.Logger, c.LoggerCleanup = zapLogger.NewLogger(logConfig)
 	c.NSQConsumer.AddHandler(nsq.HandlerFunc(func(m *nsq.Message) error {

@@ -123,6 +123,8 @@ github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRI
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/reggiepy/goutils v0.0.0-20250514081918-dfe60e23a46e h1:IWs89o4v1CJ3ceB8riUwPqZxdiRezFEHqF/Jw3wSUNU=
 github.com/reggiepy/goutils v0.0.0-20250514081918-dfe60e23a46e/go.mod h1:CMxOfps+i+qys5kwTJS9HqkvsgAluvPeRkeTANSZS64=
+github.com/reggiepy/goutils v0.0.0-20250522100603-76659a5639ed h1:HXtEuIbgPQ477jv2zOjyg+VIDaVqnc7hUulZWJ0S35c=
+github.com/reggiepy/goutils v0.0.0-20250522100603-76659a5639ed/go.mod h1:CMxOfps+i+qys5kwTJS9HqkvsgAluvPeRkeTANSZS64=
 github.com/rogpeppe/go-internal v1.11.0 h1:cWPaGQEPrBb5/AsnsZesgZZ9yb1OQ+GOISoDNXVBh4M=
 github.com/rogpeppe/go-internal v1.11.0/go.mod h1:ddIwULY96R17DhadqLgMfk9H9tvdUzkipdSkR5nkCZA=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
