@@ -19,6 +19,7 @@ jobs:
           
       - name: Make All
         run: |
+          chmod +x ./package.sh
           ./package.sh
 
       - name: Run GoReleaser
