@@ -26,3 +26,4 @@ gen
 # vendor/
 
 store/
+bin/
