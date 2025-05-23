@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/reggiepy/LogBeetle/boot"
 	"github.com/reggiepy/LogBeetle/global"
-	"github.com/reggiepy/LogBeetle/ldb"
 	"github.com/reggiepy/LogBeetle/pkg/version"
 	"os"
 
@@ -54,8 +53,6 @@ var rootCmd = cobra.Command{
 		global.LbLogger, global.LbLoggerClearup = boot.Logger()
 		global.LbNsqProducer = boot.NsqProducer(global.LbConfig.NSQConfig)
 		boot.Ldb()
-		// 默认引擎空转一下，触发未建索引继续建
-		go ldb.NewDefaultEngine().AddTextLog("", "", "")
 		global.LBConsumerManager = boot.Consumer()
 		boot.Boot()
 		return nil

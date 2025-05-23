@@ -20,5 +20,7 @@ func Logger() (*zap.Logger, func()) {
 	}
 	//fmt.Println("Log Config: ", logConfig.ToJSON())
 	logger, cleanup := zapLogger.NewLogger(logConfig)
+	zap.L().Info("logger initialized", zap.Any("global", global.LbConfig.LogConfig))
+	zap.S().Info("logger initialized", zap.Any("cleanup", cleanup))
 	return logger, cleanup
 }
