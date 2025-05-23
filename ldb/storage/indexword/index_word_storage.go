@@ -11,7 +11,6 @@ import (
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/ldb/status"
 	"github.com/reggiepy/LogBeetle/ldb/storage/indexdoc"
-	"github.com/reggiepy/goutils/signailUtils"
 	"os"
 	"sync"
 	"time"
@@ -40,7 +39,6 @@ var mapStorageMu sync.Mutex
 
 func init() {
 	mapStorage = make(map[string](*WordIndexStorage))
-	signailUtils.OnExit(onExit) // 优雅退出
 }
 
 func getStorage(cacheName string) *WordIndexStorage {
@@ -221,14 +219,4 @@ func (s *WordIndexStorage) StoreName() string {
 // 是否关闭中状态
 func (s *WordIndexStorage) IsClose() bool {
 	return s.closing
-}
-
-func onExit() {
-	for k := range mapStorage {
-		s := mapStorage[k]
-		if s != nil {
-			s.Close()
-		}
-	}
-	global.LbLogger.Info("退出WordIndexStorage")
 }

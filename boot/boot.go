@@ -16,12 +16,12 @@ func Boot() {
 		Addr:    addr,
 		Handler: Router(),
 	}
+	logo(addr)
 	go func() {
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			global.LbLogger.Fatal(fmt.Sprintf("start http server error: %v", err))
 		}
 	}()
-	logo(addr)
 
 	signailUtils.OnExit(func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
@@ -30,12 +30,14 @@ func Boot() {
 			global.LbLogger.Info(fmt.Sprintf("force exit web：%v", err))
 		}
 		global.LbLogger.Info("exit web complete！")
-		global.LbLoggerClearup() // 确保在程序退出时刷新日志缓冲区
 	})
 
 	signailUtils.WaitExit(1 * time.Second)
+	if global.LbLoggerClearup != nil {
+		global.LbLoggerClearup()
+	}
 }
 
 func logo(addr string) {
-	global.LbLogger.Info("System started, listening: http://" + addr)
+	fmt.Printf("System started, listening: http://%s\n", addr)
 }

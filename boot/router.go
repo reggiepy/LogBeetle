@@ -40,7 +40,7 @@ func Router() *gin.Engine {
 
 	// 注册全局中间件
 	r.Use(middleware.RequestID())
-	r.Use(middleware.ErrorHandler(global.LbLogger))
+	r.Use(middleware.GinRecovery(global.LbLogger, true))
 	r.Use(middleware.GinLogger(global.LbLogger))
 	r.Use(middleware.Cors())
 

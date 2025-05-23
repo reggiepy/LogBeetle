@@ -9,6 +9,7 @@ import (
 	"github.com/reggiepy/LogBeetle/ldb/storage/indexword"
 	"github.com/reggiepy/LogBeetle/ldb/storage/logdata"
 	"github.com/reggiepy/LogBeetle/ldb/tokenizer"
+	"go.uber.org/zap"
 )
 
 type Engine struct {
@@ -57,6 +58,7 @@ func (e *Engine) Search(cond *search.SearchCondition) *search.SearchResult {
 
 	// 【快速检查1】，存在无索引数据的关键词时，直接返回
 	idxw := indexword.NewWordIndexStorage(e.storeName)
+	global.LbLogger.Debug("world index storage", zap.String("storeName", idxw.StoreName()))
 	totalCount := e.logStorage.TotalCount() // 当前日志仓总件数
 	maxMatchCount := totalCount             // 最大匹配件数
 	for _, word := range kws {

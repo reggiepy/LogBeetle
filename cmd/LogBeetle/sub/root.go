@@ -50,7 +50,7 @@ var rootCmd = cobra.Command{
 		global.LbViper = boot.Viper()
 		//configString, _ := jsonutil.EncodeString(global.LbConfig)
 		//fmt.Println("Config: ", configString)
-		global.LbLogger, global.LbLoggerClearup = boot.Logger()
+		global.LbLogger = boot.Logger()
 		global.LbNsqProducer = boot.NsqProducer(global.LbConfig.NSQConfig)
 		boot.Ldb()
 		global.LBConsumerManager = boot.Consumer()

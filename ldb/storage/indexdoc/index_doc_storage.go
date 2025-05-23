@@ -10,7 +10,6 @@ import (
 	"github.com/reggiepy/LogBeetle/com"
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/ldb/status"
-	"github.com/reggiepy/goutils/signailUtils"
 	"sync"
 	"time"
 
@@ -34,7 +33,6 @@ var mapStorageMu sync.Mutex
 
 func init() {
 	mapStorage = make(map[string](*DocIndexStorage))
-	signailUtils.OnExit(onExit) // 优雅退出
 }
 
 func getStorage(cacheName string) *DocIndexStorage {
@@ -163,12 +161,3 @@ func (s *DocIndexStorage) IsClose() bool {
 	return s.closing
 }
 
-func onExit() {
-	for k := range mapStorage {
-		s := mapStorage[k]
-		if s != nil {
-			s.Close()
-		}
-	}
-	global.LbLogger.Info("退出DocIndexStorage")
-}
