@@ -1,0 +1,60 @@
+name: 🐛 Bug Report
+description: 提交一个错误或异常问题
+title: "[Bug]: "
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你报告一个 Bug！请尽可能完整地填写以下信息，以帮助我们复现问题。
+
+  - type: input
+    id: environment
+    attributes:
+      label: 运行环境
+      description: 请说明你的操作系统、浏览器、Go 版本等相关环境信息。
+      placeholder: 例如：Windows 11, Go 1.21, Firefox 122
+    validations:
+      required: true
+
+  - type: textarea
+    id: describe
+    attributes:
+      label: Bug 描述
+      description: 清晰地描述 Bug 的表现和你期望的行为。
+      placeholder: 描述问题和期望的结果。
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 描述复现该 Bug 的步骤，最好能附带代码/截图。
+      placeholder: |
+        1. 打开...
+        2. 点击...
+        3. 出现错误...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 软件版本
+      description: 请填写你遇到 Bug 时使用的软件版本。
+      placeholder: 例如：v1.2.3
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前检查项
+      options:
+        - label: 我已在 [Issues](https://github.com/your/repo/issues) 中确认该问题尚未被提出。
+          required: true
+        - label: 我已提供足够的信息以复现问题。
+          required: true

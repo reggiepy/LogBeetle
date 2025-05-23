@@ -1,5 +1,5 @@
-name: Build LogBeetle Windows Binary
-run-name: ${{ gitea.actor }} is Build Windows Actions 🚀
+name: releaser
+run-name: ${{ gitea.actor }} is Build Actions 🚀
 
 on:
   push:
