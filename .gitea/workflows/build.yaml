@@ -1,7 +1,10 @@
 name: Build LogBeetle Windows Binary
 run-name: ${{ gitea.actor }} is Build Windows Actions 🚀
 
-on: [push]
+on:
+  push:
+    tags:
+      - "*"
 
 jobs:
   build-windows:
