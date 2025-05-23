@@ -11,6 +11,7 @@ import (
 	"github.com/reggiepy/LogBeetle/com"
 	"github.com/reggiepy/LogBeetle/global"
 	"github.com/reggiepy/LogBeetle/ldb/storage/logdata"
+	"strings"
 )
 
 var mapStorageHandle map[string](*LogDataStorageHandle)
@@ -43,11 +44,11 @@ func NewLogDataStorageHandle(storeName string) *LogDataStorageHandle {
 
 // 添加日志（参数是普通文本日志）
 func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system string) {
-	txt := com.Trim(logText)
+	txt := strings.TrimSpace(logText)
 	ary := com.Split(txt, "\n")
 
 	d := new(logdata.LogDataModel)
-	d.Text = com.Trim(ary[0])
+	d.Text = strings.TrimSpace(ary[0])
 	if len(ary) > 1 {
 		d.Detail = txt
 	}

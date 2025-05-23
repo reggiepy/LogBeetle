@@ -8,6 +8,7 @@ import (
 	"github.com/reggiepy/LogBeetle/ldb/storage/logdata"
 	"github.com/reggiepy/LogBeetle/model"
 	"net/http"
+	"strings"
 )
 
 type ApiLog struct{}
@@ -29,19 +30,19 @@ func (a *ApiLog) Search(c *gin.Context) {
 	}
 
 	cond := &search.SearchCondition{
-		StoreName:        l.StoreName,                        // 日志仓条件
-		SearchKey:        l.SearchKey,                        // 输入的查询关键词
-		CurrentStoreName: l.CurrentStoreName,                 // 滚动查询时定位用日志仓
-		CurrentId:        com.StringToUint32(l.CurrentId, 0), // 滚动查询时定位用ID
-		Forward:          com.StringToBool(l.Forward, true),  // 是否向下滚动查询
-		OldNearId:        com.StringToUint32(l.OldNearId, 0), // 相邻检索旧ID
-		NewNearId:        com.StringToUint32(l.NewNearId, 0), // 相邻检索新ID
-		NearStoreName:    l.NearStoreName,                    // 相邻检索时新ID对应的日志仓
-		DatetimeFrom:     l.DatetimeFrom,                     // 日期范围（From）
-		DatetimeTo:       l.DatetimeTo,                       // 日期范围（To）
-		OrgSystem:        com.ToLower(com.Trim(l.System)),    // 系统
-		User:             com.ToLower(com.Trim(l.User)),      // 用户
-		Loglevel:         com.ToLower(l.LogLevel),            // 日志级别
+		StoreName:        l.StoreName,                              // 日志仓条件
+		SearchKey:        l.SearchKey,                              // 输入的查询关键词
+		CurrentStoreName: l.CurrentStoreName,                       // 滚动查询时定位用日志仓
+		CurrentId:        com.StringToUint32(l.CurrentId, 0),       // 滚动查询时定位用ID
+		Forward:          com.StringToBool(l.Forward, true),        // 是否向下滚动查询
+		OldNearId:        com.StringToUint32(l.OldNearId, 0),       // 相邻检索旧ID
+		NewNearId:        com.StringToUint32(l.NewNearId, 0),       // 相邻检索新ID
+		NearStoreName:    l.NearStoreName,                          // 相邻检索时新ID对应的日志仓
+		DatetimeFrom:     l.DatetimeFrom,                           // 日期范围（From）
+		DatetimeTo:       l.DatetimeTo,                             // 日期范围（To）
+		OrgSystem:        com.ToLower(strings.TrimSpace(l.System)), // 系统
+		User:             com.ToLower(strings.TrimSpace(l.User)),   // 用户
+		Loglevel:         com.ToLower(l.LogLevel),                  // 日志级别
 	}
 	cond.Loglevels = com.Split(cond.Loglevel, ",") // 多选条件
 	data := serverPublic.LogService.Search(cond)

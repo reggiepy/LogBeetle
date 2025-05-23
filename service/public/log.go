@@ -7,6 +7,7 @@ import (
 	"github.com/reggiepy/LogBeetle/ldb/search"
 	"github.com/reggiepy/LogBeetle/ldb/storage/logdata"
 	"github.com/reggiepy/LogBeetle/ldb/sysmnt"
+	"strings"
 	"time"
 )
 
@@ -34,7 +35,7 @@ func (s *LogService) Search(cond *search.SearchCondition) *search.SearchResult {
 		cond.Loglevels = make([]string, 0) // 多选的单选或全选，都清空（单选走loglevel索引，全选等于没选）
 	}
 	if !com.IsBlank(cond.Loglevel) && !com.Contains(cond.Loglevel, ",") {
-		cond.Loglevel = "!" + com.Trim(cond.Loglevel) // 编辑日志级别单选条件，以便精确匹配
+		cond.Loglevel = "!" + strings.TrimSpace(cond.Loglevel) // 编辑日志级别单选条件，以便精确匹配
 	} else {
 		cond.Loglevel = "" // 清空日志级别单选条件，以便多选配配（改用loglevels）
 	}
@@ -209,7 +210,7 @@ func (s *LogService) AddTestData() error {
 
 // 添加日志（JSON提交方式）
 func (s *LogService) JsonLogAdd(md *logdata.LogDataModel) error {
-	md.Text = com.Trim(md.Text)
+	md.Text = strings.TrimSpace(md.Text)
 	addDataModelLog(md)
 	return nil
 }

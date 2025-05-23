@@ -2,6 +2,7 @@ package ldb
 
 import (
 	"github.com/reggiepy/LogBeetle/com"
+	"github.com/reggiepy/LogBeetle/ldb/search"
 	"github.com/reggiepy/LogBeetle/ldb/storage/logdata"
 	"testing"
 	"time"
@@ -27,5 +28,20 @@ func TestEngine(t *testing.T) {
 
 func TestEngineTotalCount(t *testing.T) {
 	engine := NewDefaultEngine()
-	engine.Search()
+	cond := &search.SearchCondition{
+		StoreName:        "",       // 日志仓条件
+		SearchKey:        "测试用的日志", // 输入的查询关键词
+		CurrentStoreName: "",       // 滚动查询时定位用日志仓
+		CurrentId:        0,        // 滚动查询时定位用ID
+		Forward:          true,     // 是否向下滚动查询
+		OldNearId:        0,        // 相邻检索旧ID
+		NewNearId:        0,        // 相邻检索新ID
+		NearStoreName:    "",       // 相邻检索时新ID对应的日志仓
+		DatetimeFrom:     "",       // 日期范围（From）
+		DatetimeTo:       "",       // 日期范围（To）
+		OrgSystem:        "",  // 系统
+		User:             "",  // 用户
+		Loglevel:         "DEBUG",  // 日志级别
+	}
+	engine.Search(cond)
 }
