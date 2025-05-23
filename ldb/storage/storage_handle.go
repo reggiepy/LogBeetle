@@ -64,7 +64,7 @@ func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system st
 		if s.storage.IsClose() {
 			s.storage = logdata.NewLogDataStorage(s.storage.StoreName())
 		}
-		s.storage.Add(d)
+		_ = s.storage.Add(d)
 	}
 }
 
@@ -85,7 +85,7 @@ func (s *LogDataStorageHandle) AddLogDataModel(data *logdata.LogDataModel) {
 		if s.storage.IsClose() {
 			s.storage = logdata.NewLogDataStorage(s.storage.StoreName())
 		}
-		s.storage.Add(data)
+		_ = s.storage.Add(data)
 	}
 }
 
@@ -101,7 +101,7 @@ func (s *LogDataStorageHandle) GetLogDataDocument(id uint32) *logdata.LogDataDoc
 func (s *LogDataStorageHandle) GetLogDataModel(id uint32) *logdata.LogDataModel {
 	d := s.GetLogDataDocument(id)
 	m := new(logdata.LogDataModel)
-	m.LoadJson(d.Content)
+	_ = m.LoadJson(d.Content)
 	return m
 }
 

@@ -93,9 +93,7 @@ func (m *Manager) Delete(name string) {
 	m.mux.Lock()
 	defer m.mux.Unlock()
 
-	if _, exists := m.consumers[name]; exists {
-		delete(m.consumers, name)
-	}
+	delete(m.consumers, name)
 }
 
 // ExistName 检查消费者是否存在

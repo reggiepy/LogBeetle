@@ -61,7 +61,7 @@ func NewSysmntStorage() *SysmntStorage { // 存储器，文档，自定义对象
 	dbPath := global.LbConfig.Store.Root + com.PathSeparator() + cacheName
 	db, err := leveldb.OpenFile(dbPath, nil) // 打开（在指定子目录中存放数据）
 	if err != nil {
-		global.LbLogger.Error(fmt.Sprintf("打开SysmntStorage失败：", dbPath))
+		global.LbLogger.Error(fmt.Sprintf("打开SysmntStorage失败：%s", dbPath))
 		panic(err)
 	}
 	store.leveldb = db
@@ -143,7 +143,10 @@ func (s *SysmntStorage) SaveSysUser(user *SysUser) error {
 		sort.Slice(names, func(i, j int) bool {
 			return names[i] < names[j] // 排序
 		})
-		s.SaveSysUsernames(names) // 保存用户名列表
+		err := s.SaveSysUsernames(names)
+		if err != nil {
+			return err
+		}
 	} else {
 		// 更新时，如果密码没传，保持原密码不变
 		if user.Password == "" {
@@ -167,7 +170,10 @@ func (s *SysmntStorage) DeleteSysUser(user *SysUser) error {
 	sort.Slice(newNames, func(i, j int) bool {
 		return newNames[i] < newNames[j]
 	})
-	s.SaveSysUsernames(newNames)                                               // 用户名列表中删除该用户名
+	err := s.SaveSysUsernames(newNames)
+	if err != nil {
+		return err
+	}                                               // 用户名列表中删除该用户名
 	return s.leveldb.Delete(com.StringToBytes(USER_PREFIX+user.Username), nil) // 删除该用户数据
 }
 
@@ -180,7 +186,7 @@ func (s *SysmntStorage) GetStorageDataCount(storeName string) uint32 {
 }
 
 func (s *SysmntStorage) SetStorageDataCount(storeName string, count uint32) {
-	s.Put(com.StringToBytes("data:"+storeName), com.Uint32ToBytes(count))
+	_ = s.Put(com.StringToBytes("data:"+storeName), com.Uint32ToBytes(count))
 }
 
 func (s *SysmntStorage) GetStorageIndexCount(storeName string) uint32 {
@@ -192,7 +198,7 @@ func (s *SysmntStorage) GetStorageIndexCount(storeName string) uint32 {
 }
 
 func (s *SysmntStorage) SetStorageIndexCount(storeName string, count uint32) {
-	s.Put(com.StringToBytes("index:"+storeName), com.Uint32ToBytes(count))
+	_ = s.Put(com.StringToBytes("index:"+storeName), com.Uint32ToBytes(count))
 }
 
 func (s *SysmntStorage) DeleteStorageInfo(storeName string) error {

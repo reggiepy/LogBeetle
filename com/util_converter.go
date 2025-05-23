@@ -83,7 +83,7 @@ func StringToUint32(s string, defaultVal ...uint32) uint32 {
 func IntToBytes(intNum int) []byte {
 	data := int64(intNum)
 	bytebuf := bytes.NewBuffer([]byte{})
-	binary.Write(bytebuf, binary.BigEndian, data)
+	_ = binary.Write(bytebuf, binary.BigEndian, data)
 	return bytebuf.Bytes()
 }
 
@@ -182,7 +182,7 @@ func IntToExcelColumn(iCol int) string {
 // io.Reader 转 []byte
 func ReaderToBytes(ioReader io.Reader) []byte {
 	buf := &bytes.Buffer{}
-	buf.ReadFrom(ioReader)
+	_, _ = buf.ReadFrom(ioReader)
 	return buf.Bytes()
 }
 

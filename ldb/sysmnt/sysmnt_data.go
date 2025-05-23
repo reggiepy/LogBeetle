@@ -27,7 +27,7 @@ func (s *SysmntStorage) SetSysmntData(key string, value *SysmntData) {
 		panic(err)
 	}
 	v := buffer.Bytes()
-	s.Put(k, v)
+	_ = s.Put(k, v)
 }
 
 func (s *SysmntStorage) GetSysmntData(key string) *SysmntData {

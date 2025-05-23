@@ -145,7 +145,7 @@ func (s *LogDataStorage) readyGo() {
 
 			// 索引生成完成后，等待接收保存日志
 			if n < 1 {
-				global.LbLogger.Info(fmt.Sprintf("空闲等待接收日志"))
+				global.LbLogger.Info("空闲等待接收日志")
 				data := <-s.storeChan // 没有索引可生成时，等待storeChan
 				s.wg.Done()
 				if data == nil {
@@ -173,7 +173,7 @@ func (s *LogDataStorage) saveLogData(model *LogDataModel) {
 	doc.Content = model.ToJson()                  // 转json作为内容(含Id)
 
 	// 保存
-	s.put(com.Uint32ToBytes(doc.Id), doc.ToBytes()) // 日志数据
+	_ = s.put(com.Uint32ToBytes(doc.Id), doc.ToBytes()) // 日志数据
 	global.LbLogger.Info(fmt.Sprintf("保存日志数据 %d", doc.Id))
 }
 
@@ -219,7 +219,7 @@ func (s *LogDataStorage) createInvertedIndex() int {
 	// 每个关键词都创建反向索引
 	for _, word := range kws {
 		idxw := indexword.NewWordIndexStorage(s.StoreName())
-		idxw.Add(word, com.StringToUint32(docm.Id, 0)) // 日志ID加入索引
+		_ = idxw.Add(word, com.StringToUint32(docm.Id, 0)) // 日志ID加入索引
 	}
 	// fmt.Println("创建日志索引：", com.StringToUint32(docm.Id, 0))
 
@@ -344,16 +344,16 @@ func (s *LogDataStorage) saveMetaData() {
 
 	if s.savedCurrentCount < s.currentCount {
 		s.savedCurrentCount = s.currentCount
-		s.leveldb.Put(zeroUint32Bytes, com.Uint32ToBytes(s.savedCurrentCount), nil) // 保存日志总件数
-		sysmntStore := sysmnt.NewSysmntStorage()                                    // 系统管理存储器
-		sysmntStore.SetStorageDataCount(s.storeName, s.savedCurrentCount)           // 保存日志总件数
+		_ = s.leveldb.Put(zeroUint32Bytes, com.Uint32ToBytes(s.savedCurrentCount), nil) // 保存日志总件数
+		sysmntStore := sysmnt.NewSysmntStorage()                                        // 系统管理存储器
+		sysmntStore.SetStorageDataCount(s.storeName, s.savedCurrentCount)               // 保存日志总件数
 		global.LbLogger.Info(fmt.Sprintf("保存LogDataStorage件数: %d", s.savedCurrentCount))
 	}
 
 	if s.savedIndexedCount < s.indexedCount {
 		s.savedIndexedCount = s.indexedCount
 		idxw := indexword.NewWordIndexStorage(s.StoreName())
-		idxw.SaveIndexedCount(s.savedIndexedCount)                         // 保存索引总件数
+		_ = idxw.SaveIndexedCount(s.savedIndexedCount)                     // 保存索引总件数
 		sysmntStore := sysmnt.NewSysmntStorage()                           // 系统管理存储器
 		sysmntStore.SetStorageIndexCount(s.storeName, s.savedIndexedCount) // 保存索引总件数
 		global.LbLogger.Info(fmt.Sprintf("保存LogDataStorage已建索引件数: %d", s.savedIndexedCount))

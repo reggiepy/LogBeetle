@@ -71,9 +71,9 @@ func GetDirInfo(path string) (uint32, int64, error) {
 }
 
 func Random() uint32 {
-	rand.Seed(time.Now().UnixNano())
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	for {
-		v := rand.Uint32()
+		v := r.Uint32()
 		if v != 0 {
 			return v
 		}

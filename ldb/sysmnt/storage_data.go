@@ -72,7 +72,7 @@ func GetStorageList() *StorageResult {
 	stat, _ := disk.Usage(global.LbConfig.Store.Root)
 
 	rs := &StorageResult{
-		Info: fmt.Sprintf("日志总量 " + com.Int64ToString(total) + " 条，共占用空间 " + com.GetSizeInfo(uint64(sum)) + "，剩余空间 " + com.GetSizeInfo(stat.Free)),
+		Info: fmt.Sprintf("日志总量 %s 条，共占用空间 %s，剩余空间 %s", com.Int64ToString(total), com.GetSizeInfo(uint64(sum)), com.GetSizeInfo(stat.Free)),
 		Data: datas,
 	}
 	return rs

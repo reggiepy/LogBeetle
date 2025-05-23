@@ -23,14 +23,14 @@ type SysUser struct {
 func (s *SysUser) ToBytes() []byte {
 	buffer := new(bytes.Buffer)
 	encoder := gob.NewEncoder(buffer)
-	encoder.Encode(s)
+	_ = encoder.Encode(s)
 	return buffer.Bytes()
 }
 
 func (s *SysUser) LoadBytes(data []byte) {
 	buffer := bytes.NewBuffer(data)
 	decoder := gob.NewDecoder(buffer)
-	decoder.Decode(s)
+	_ = decoder.Decode(s)
 }
 
 func (s *SysUser) ToJson() string {

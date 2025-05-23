@@ -14,18 +14,18 @@ type LogDataDocument struct {
 func (d *LogDataDocument) ToBytes() []byte {
 	buffer := new(bytes.Buffer)
 	encoder := gob.NewEncoder(buffer)
-	encoder.Encode(d)
+	_ = encoder.Encode(d)
 	return buffer.Bytes()
 }
 
 func (d *LogDataDocument) LoadBytes(data []byte) {
 	buffer := bytes.NewBuffer(data)
 	decoder := gob.NewDecoder(buffer)
-	decoder.Decode(d)
+	_ = decoder.Decode(d)
 }
 
 func (d *LogDataDocument) ToLogDataModel() *LogDataModel {
 	rs := new(LogDataModel)
-	rs.LoadJson(d.Content)
+	_ = rs.LoadJson(d.Content)
 	return rs
 }

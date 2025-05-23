@@ -20,7 +20,7 @@ func Consumer() *manager.Manager {
 	consumerConfig := global.LbConfig.ConsumerConfig
 
 	if len(consumerConfig.NSQConsumers) == 0 {
-		zap.L().Fatal(fmt.Sprintf("consumer config is empty"))
+		zap.L().Fatal("consumer config is empty")
 	}
 	options := []nsq_consumer.Options{
 		nsq_consumer.WithNSQAuthSecret(nsqConfig.AuthSecret),

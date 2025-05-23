@@ -32,21 +32,20 @@ func (s *StorageMntService) Delete(storeName string) error {
 		if global.LbConfig.Store.SaveDays > 0 {
 			ymd := com.Right(name, 8)
 			if com.Len(ymd) == 8 && com.Startwiths(ymd, "20") {
-				msg := fmt.Sprintf("当前是日志仓自动维护模式，最多保存 %d 天，不支持手动删除", global.LbConfig.Store.SaveDays)
-				return fmt.Errorf(msg)
+				return fmt.Errorf("当前是日志仓自动维护模式，最多保存 %d 天，不支持手动删除", global.LbConfig.Store.SaveDays)
 			}
 		}
 	} else if name == "logdata" {
-		return fmt.Errorf("日志仓 " + name + " 正在使用，不能删除")
+		return fmt.Errorf("日志仓 %s 正在使用，不能删除", name)
 	}
 
 	if status.IsStorageOpening(name) {
-		return fmt.Errorf("日志仓 " + name + " 正在使用，不能删除")
+		return fmt.Errorf("日志仓 %s 正在使用，不能删除", name)
 	}
 
 	err := sysmnt.DeleteStorage(name)
 	if err != nil {
-		return fmt.Errorf("日志仓 " + name + " 正在使用，不能删除")
+		return fmt.Errorf("日志仓 %s 正在使用，不能删除", name)
 	}
 
 	cacheTime = time.Now().Add(-1 * time.Hour) // 让检索时不用缓存名，避免查询不存在的日志仓

@@ -66,7 +66,7 @@ func CopyFile(srcFilePath string, dstFilePath string) error {
 	}
 	defer srcFile.Close()
 
-	MkdirAll(Dir(dstFilePath))
+	_ = MkdirAll(Dir(dstFilePath))
 	distFile, err := os.Create(dstFilePath)
 	if err != nil {
 		return err
@@ -143,7 +143,7 @@ func WriteFileString(filename string, content string) error {
 
 // 写文件（指定目录不存在时先创建，不含目录时存当前目录）
 func WriteFileBytes(filename string, data []byte) error {
-	os.MkdirAll(filepath.Dir(filename), 0777)
+	_ = os.MkdirAll(filepath.Dir(filename), 0777)
 	return os.WriteFile(filename, data, 0666)
 }
 
@@ -164,6 +164,6 @@ func ReadFileString(filename string) (string, error) {
 // 在系统目录中创建临时文件
 func CreateBlankTempFile() string {
 	file := os.TempDir() + "/" + ULID() + ".txt"
-	WriteFileString(file, "")
+	_ = WriteFileString(file, "")
 	return file
 }
