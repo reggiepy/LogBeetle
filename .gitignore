@@ -27,3 +27,6 @@ gen
 
 store/
 bin/
+packages/
+release/
+test/bin/
